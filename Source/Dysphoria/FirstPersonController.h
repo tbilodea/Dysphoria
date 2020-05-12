@@ -40,4 +40,10 @@ private:
 
 	UFUNCTION()
 	void LookUpRate(float Value);
+
+	UFUNCTION()
+	void StartJump();
+
+	UFUNCTION()
+	void StopJump();
 };

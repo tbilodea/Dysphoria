@@ -42,6 +42,9 @@ void AFirstPersonController::SetupPlayerInputComponent(UInputComponent* PlayerIn
 	PlayerInputComponent->BindAxis("LookUpRate", this, &AFirstPersonController::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("TurnRate", this, &AFirstPersonController::AddControllerYawInput);
 
+	//Jump
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AFirstPersonController::StartJump);
+	PlayerInputComponent->BindAction("Jump", IE_Released, this, &AFirstPersonController::StopJump);
 }
 
 void AFirstPersonController::MoveForward(float Value)
@@ -66,4 +69,14 @@ void AFirstPersonController::TurnRate(float Value)
 void AFirstPersonController::LookUpRate(float Value)
 {
 	AddControllerPitchInput(Value * ControllerPitchSensitivity);
+}
+
+void AFirstPersonController::StartJump()
+{
+	bPressedJump = true;
+}
+
+void AFirstPersonController::StopJump()
+{
+	bPressedJump = false;
 }
