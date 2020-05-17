@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "FirstPersonController.generated.h"
 
+class UCameraComponent;
+
 UCLASS()
 class DYSPHORIA_API AFirstPersonController : public ACharacter
 {
@@ -19,6 +21,13 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	UFUNCTION()
+	void MoveForward(float Value);
+
+	UFUNCTION()
+	void MoveRight(float Value);
+
 protected:
 
 	virtual void BeginPlay() override;
@@ -29,11 +38,13 @@ private:
 	float ControllerYawSensitivity = 1.f;
 	float ControllerPitchSensitivity = 1.f;
 
-	UFUNCTION()
-	void MoveForward(float Value);
-
-	UFUNCTION()
-	void MoveRight(float Value);
+	// FPS camera.
+	UPROPERTY(VisibleAnywhere)
+	UCameraComponent* FPSCameraComponent;
+	
+	// First-person mesh (arms), visible only to the owning player.
+	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
+	USkeletalMeshComponent* FPSMesh;
 
 	UFUNCTION()
 	void TurnRate(float Value);

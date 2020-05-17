@@ -2,6 +2,8 @@
 
 
 #include "FirstPersonController.h"
+#include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
 
 // Sets default values
 AFirstPersonController::AFirstPersonController()
@@ -9,6 +11,20 @@ AFirstPersonController::AFirstPersonController()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	//Camera setup
+	FPSCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
+	FPSCameraComponent->SetupAttachment(Cast<USceneComponent>(GetCapsuleComponent()));
+	FPSCameraComponent->SetRelativeLocation(FVector(0.f, 0.f, 50.f + BaseEyeHeight));
+	FPSCameraComponent->bUsePawnControlRotation = true;
+
+	// FPS Mesh
+	FPSMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FirstPersonMesh"));
+	// Only the owning player sees this mesh. TODO change when setting up multiplayer?
+	FPSMesh->SetOnlyOwnerSee(true);
+	FPSMesh->SetupAttachment(FPSCameraComponent);
+	// Disable some environmental shadowing to preserve the illusion of having a single mesh.
+	FPSMesh->bCastDynamicShadow = false;
+	FPSMesh->CastShadow = false;
 }
 
 // Called when the game starts or when spawned
