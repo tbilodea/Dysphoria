@@ -32,6 +32,13 @@ protected:
 
 	virtual void BeginPlay() override;
 
+	UPROPERTY(EditDefaultsOnly, Category = Projectile)
+	TSubclassOf<class AFPSProjectile> ProjectileClass;
+
+	// Gun muzzle's offset from the camera location.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	FVector MuzzleOffset;
+
 private:
 	float SpeedMultiplier = 1.0f;
 	float BaseSpeed = 0.f;
@@ -41,7 +48,7 @@ private:
 	// FPS camera.
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* FPSCameraComponent;
-	
+
 	// First-person mesh (arms), visible only to the owning player.
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
 	USkeletalMeshComponent* FPSMesh;
@@ -57,4 +64,7 @@ private:
 
 	UFUNCTION()
 	void StopJump();
+
+	UFUNCTION()
+	void Fire();  //For firing projectiles
 };

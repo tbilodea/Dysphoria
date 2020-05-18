@@ -61,6 +61,9 @@ void AFirstPersonController::SetupPlayerInputComponent(UInputComponent* PlayerIn
 	//Jump
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AFirstPersonController::StartJump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &AFirstPersonController::StopJump);
+
+	//Fire
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AFirstPersonController::Fire);
 }
 
 void AFirstPersonController::MoveForward(float Value)
@@ -95,4 +98,9 @@ void AFirstPersonController::StartJump()
 void AFirstPersonController::StopJump()
 {
 	bPressedJump = false;
+}
+
+void AFirstPersonController::Fire()
+{
+
 }
