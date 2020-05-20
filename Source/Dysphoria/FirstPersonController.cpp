@@ -2,6 +2,7 @@
 
 
 #include "FirstPersonController.h"
+#include "FPSProjectile.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 
@@ -102,5 +103,37 @@ void AFirstPersonController::StopJump()
 
 void AFirstPersonController::Fire()
 {
+	UE_LOG(LogTemp, Warning, TEXT("Fire"));
+	// Attempt to fire a projectile.
+	if (ProjectileClass)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Fire w Proj Class"));
+		// Get the camera transform.
+		FVector CameraLocation;
+		FRotator CameraRotation;
+		GetActorEyesViewPoint(CameraLocation, CameraRotation);
 
+		// Transform MuzzleOffset from camera space to world space.
+		FVector MuzzleLocation = CameraLocation + FTransform(CameraRotation).TransformVector(MuzzleOffset);
+		FRotator MuzzleRotation = CameraRotation;
+		// Skew the aim to be slightly upwards.
+		MuzzleRotation.Pitch += 10.0f;
+		UWorld* World = GetWorld();
+		if (World)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Fire w/proj class and world"));
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.Owner = this;
+
+			// Spawn the projectile at the muzzle.
+			AFPSProjectile* Projectile = World->SpawnActor<AFPSProjectile>(ProjectileClass, MuzzleLocation, MuzzleRotation, SpawnParams);
+			if (Projectile)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("created projectile"));
+				// Set the projectile's initial trajectory.
+				FVector LaunchDirection = MuzzleRotation.Vector();
+				Projectile->FireInDirection(LaunchDirection);
+			}
+		}
+	}
 }
