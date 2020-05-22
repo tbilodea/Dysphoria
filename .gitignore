@@ -82,6 +82,4 @@ DerivedDataCache/*
 
 #Ignore starter materials
 Content/StarterContent/
-Content/FirstPerson/
-Content/FirstPersonBP/
-Content/Geometry/
+Content/Examples

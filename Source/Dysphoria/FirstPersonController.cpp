@@ -107,7 +107,6 @@ void AFirstPersonController::Fire()
 	// Attempt to fire a projectile.
 	if (ProjectileClass)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Fire w Proj Class"));
 		// Get the camera transform.
 		FVector CameraLocation;
 		FRotator CameraRotation;
@@ -121,7 +120,6 @@ void AFirstPersonController::Fire()
 		UWorld* World = GetWorld();
 		if (World)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Fire w/proj class and world"));
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.Owner = this;
 
@@ -129,7 +127,6 @@ void AFirstPersonController::Fire()
 			AFPSProjectile* Projectile = World->SpawnActor<AFPSProjectile>(ProjectileClass, MuzzleLocation, MuzzleRotation, SpawnParams);
 			if (Projectile)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("created projectile"));
 				// Set the projectile's initial trajectory.
 				FVector LaunchDirection = MuzzleRotation.Vector();
 				Projectile->FireInDirection(LaunchDirection);
