@@ -65,6 +65,8 @@ public:
 	//Returns a pointer to the RoomData at row/col
 	std::shared_ptr<RoomData> GetRoomData(const int row, const int col);
 
+	void InitializeLevelDataMap();
+
 private:
 	const int32 ROWS;
 	const int32 COLS;

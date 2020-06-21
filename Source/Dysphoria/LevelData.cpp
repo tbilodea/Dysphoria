@@ -6,14 +6,33 @@
 
 LevelData::LevelData() : ROWS(5), COLS(5)
 {
+	InitializeLevelDataMap();
 }
 
 LevelData::LevelData(int32 rows, int32 cols) : ROWS(rows), COLS(cols)
 {
+	InitializeLevelDataMap();
 }
 
 LevelData::~LevelData()
 {
+}
+
+//Initialize the map with the appropriate rows/cols of empty RoomDatas
+void LevelData::InitializeLevelDataMap()
+{
+	for (int row = 0; row < ROWS; row++) {
+		for (int col = 0; col < COLS; col++) {
+			RoomLocation roomLocation;
+			
+			roomLocation.row = row;
+			roomLocation.col = col;
+
+			auto roomDataPointer = std::make_shared<RoomData>(RoomData());
+
+			levelRooms.insert(std::make_pair(roomLocation, roomDataPointer));
+		}
+	}
 }
 
 //Returns copy of levelRooms map
