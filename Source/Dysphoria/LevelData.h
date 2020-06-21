@@ -7,7 +7,44 @@
 #include <map>
 
 class RoomData;
-struct RoomLocation;
+
+/*
+* Struct for defining each rooms location, since this is data that doesn't need to be in the RoomData
+*/
+struct RoomLocation {
+	int row;
+	int col;
+
+	bool operator==(const RoomLocation& rhs) const {
+		return row == rhs.row && col == rhs.col;
+	}
+
+	bool operator>(const RoomLocation& rhs) const {
+		if (row != rhs.row) {
+			if (row > rhs.row) {
+				return true;
+			}
+			else if (row < rhs.row) {
+				return false;
+			}
+		}
+		//rows are equal, so use columns
+		return col > rhs.col;
+	}
+
+	bool operator<(const RoomLocation& rhs) const {
+		if (row != rhs.row) {
+			if (row < rhs.row) {
+				return true;
+			}
+			else if (row > rhs.row) {
+				return false;
+			}
+		}
+		//rows are equal, so use columns
+		return col < rhs.col;
+	}
+};
 
 /**
  * LevelData exists to store the data about a level
