@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "DirectionUtils.h"
 #include <set>
-#include <memory>
 
 /**
  * Data structure for each room in the game
@@ -16,12 +15,12 @@ public:
 	RoomData();
 	~RoomData();
 
+	// Information about this room
 	bool ConnectedToAnotherRoom() const;
-
 	bool ConnectedToRoom(const DirectionUtils::Direction direction) const;
 
+	//Adds or removes a door to this room
 	void AddDoor(const DirectionUtils::Direction direction);
-
 	void RemoveDoor(const DirectionUtils::Direction direction);
 
 private:
