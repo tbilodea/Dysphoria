@@ -56,7 +56,7 @@ class DYSPHORIA_API LevelData
 {
 public:
 	LevelData();
-	LevelData(int32 rows, int32 cols);
+	LevelData(const int32 rows, const int32 cols);
 	~LevelData();
 
 	//Returns copy of levelRooms
