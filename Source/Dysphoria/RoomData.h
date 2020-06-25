@@ -4,7 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "DirectionUtils.h"
-#include <map>
+#include <set>
+#include <memory>
 
 /**
  * Data structure for each room in the game
@@ -15,7 +16,16 @@ public:
 	RoomData();
 	~RoomData();
 
+	bool ConnectedToAnotherRoom() const;
+
+	bool ConnectedToRoom(const DirectionUtils::Direction direction) const;
+
+	void AddDoor(const DirectionUtils::Direction direction);
+
+	void RemoveDoor(const DirectionUtils::Direction direction);
+
 private:
-	//Direction int to boolean defining if that direction has a door
-	std::map<DirectionUtils::Direction, bool> hasDoorMap;
+	//A set of Directions that have a door
+	std::set<DirectionUtils::Direction> hasDoor = {};
+
 };

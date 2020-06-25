@@ -5,13 +5,30 @@
 
 RoomData::RoomData()
 {
-	//Init doors to false
-	hasDoorMap.insert(std::make_pair(DirectionUtils::Direction::NORTH, false));
-	hasDoorMap.insert(std::make_pair(DirectionUtils::Direction::EAST, false));
-	hasDoorMap.insert(std::make_pair(DirectionUtils::Direction::SOUTH, false));
-	hasDoorMap.insert(std::make_pair(DirectionUtils::Direction::WEST, false));
 }
 
 RoomData::~RoomData()
 {
 }
+
+bool RoomData::ConnectedToAnotherRoom() const
+{
+	return hasDoor.size() != 0;
+}
+
+bool RoomData::ConnectedToRoom(const DirectionUtils::Direction direction) const
+{
+	auto it = hasDoor.find(direction);
+	return it != hasDoor.end();
+}
+
+void RoomData::AddDoor(const DirectionUtils::Direction direction)
+{
+	hasDoor.insert(direction);
+}
+
+void RoomData::RemoveDoor(const DirectionUtils::Direction direction)
+{
+	hasDoor.erase(direction);
+}
+
