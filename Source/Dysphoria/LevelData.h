@@ -3,6 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+#include "DirectionUtils.h"
+
 #include <memory>
 #include <map>
 
@@ -12,8 +15,8 @@ class RoomData;
 * Struct for defining each rooms location, since this is data that doesn't need to be in the RoomData
 */
 struct RoomLocation {
-	int row;
-	int col;
+	int32 row;
+	int32 col;
 
 	bool operator==(const RoomLocation& rhs) const {
 		return row == rhs.row && col == rhs.col;
@@ -56,7 +59,7 @@ class DYSPHORIA_API LevelData
 {
 public:
 	LevelData();
-	LevelData(const int32 rows, const int32 cols);
+	LevelData(const int32 rows, const int32 cols, const uint32 seed);
 	~LevelData();
 
 	//Returns copy of levelRooms
@@ -67,10 +70,25 @@ public:
 
 	void InitializeLevelDataMap();
 
+	std::vector<RoomLocation> GetNeighborsOf(const RoomLocation& roomLocation) const;
+
+	std::vector<RoomLocation> GetNeighborsWithDoors(const RoomLocation& roomLocation) const;
+
+	std::vector<RoomLocation> GetNeighborsWithoutDoors(const RoomLocation& roomLocation) const;
+
+	int GetRows() const;
+	int GetCols() const;
+
+	//Methods to manipulate underlying data
+	void AddDoorsBetween(const RoomLocation& room1, const RoomLocation& room2);
+
+
 private:
 	const int32 ROWS;
 	const int32 COLS;
+	const uint32 RND_SEED;
 
 	std::map<RoomLocation, std::shared_ptr<RoomData>> levelRooms;
 
+	DirectionUtils::Direction GetDirectionBetweenRooms(const RoomLocation& room1, const RoomLocation& room2) const;
 };

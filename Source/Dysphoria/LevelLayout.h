@@ -6,6 +6,7 @@
 #include <memory>
 
 class LevelData;
+struct RoomLocation;
 
 /**
  * Class that builds out the LevelData
@@ -26,5 +27,14 @@ public:
 
 private:
 	std::shared_ptr<LevelData> levelData = nullptr;
+
+	//Map building methods
+	void ConnectAllRooms();
+	void PlaceEntranceRoom();
+	void PlaceBossRoom();
+	void AddExtraDoors();
+
+	RoomLocation GetStartRoomLocation() const;
+	RoomLocation GetNeighborToAttachTo(const RoomLocation& roomLocation);
 
 };
