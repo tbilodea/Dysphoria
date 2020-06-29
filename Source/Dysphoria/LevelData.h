@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 
 #include "DirectionUtils.h"
-
 #include <memory>
 #include <map>
 
@@ -75,6 +74,8 @@ public:
 	std::vector<RoomLocation> GetNeighborsWithDoors(const RoomLocation& roomLocation) const;
 
 	std::vector<RoomLocation> GetNeighborsWithoutDoors(const RoomLocation& roomLocation) const;
+
+	std::vector<DirectionUtils::Direction> GetDirectionsWithoutDoors(const RoomLocation& roomLocation) const;
 
 	int GetRows() const;
 	int GetCols() const;

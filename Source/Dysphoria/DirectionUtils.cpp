@@ -34,3 +34,8 @@ DirectionUtils::Direction DirectionUtils::GetNextClockwiseDirection(const Direct
 
 	return Direction::NORTH;
 }
+
+std::vector<DirectionUtils::Direction> DirectionUtils::GetAllDirections()
+{
+	return { Direction::NORTH, Direction::SOUTH, Direction::EAST, Direction::WEST };
+}

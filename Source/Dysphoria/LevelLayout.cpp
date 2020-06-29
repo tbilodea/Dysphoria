@@ -16,7 +16,7 @@ LevelLayout::~LevelLayout()
 {
 }
 
-void LevelLayout::Setup(const int rowRooms, const int colRooms)
+void LevelLayout::Setup(const int32 rowRooms, const int32 colRooms)
 {
 	uint32 rndSeed = time(NULL);
 	srand(rndSeed);
@@ -54,7 +54,7 @@ std::shared_ptr<LevelData> LevelLayout::GetLevelData()
 // Using a greedy (PRIM) algorithm, connect all the rooms
 void LevelLayout::ConnectAllRooms() 
 {
-	RoomLocation startLocation = GetStartRoomLocation();
+	RoomLocation startLocation = GetRandomLocation();
 	std::vector<RoomLocation> frontier = {};
 
 	for (auto neighbor : levelData->GetNeighborsWithoutDoors(startLocation)) {
@@ -100,10 +100,34 @@ void LevelLayout::PlaceBossRoom()
 
 void LevelLayout::AddExtraDoors()
 {
-	// TODO
+	// Should probably make this logic more sophisticated since it doesn't scale to the
+	//amount of cells neighboring, but it'll do for now
+	int32 numberOfRooms = levelData->GetRows() * levelData->GetCols();
+
+	int32 numberOfDoorsToAdd = (int32) numberOfRooms * PERCENTAGE_OF_EXTRA_DOORS;
+
+	for (int32 i = 0; i < numberOfDoorsToAdd; i++) {
+		//Grab a random cell
+		RoomLocation randomLocation = GetRandomLocation();
+
+		//Pick a random Direction not given a door
+		std::vector<DirectionUtils::Direction> directions = levelData->GetDirectionsWithoutDoors(randomLocation);
+		
+		if (directions.size() == 0) {
+			//All doors are filled, so continue
+			continue;
+		}
+
+		DirectionUtils::Direction randomDirection = directions.at(rand() % directions.size());
+		RoomLocation neighborLocation = GetRoomLocationInDirection(randomLocation, randomDirection);
+
+		//Give it a door
+
+		levelData->AddDoorsBetween(randomLocation, neighborLocation);
+	}
 }
 
-RoomLocation LevelLayout::GetStartRoomLocation() const
+RoomLocation LevelLayout::GetRandomLocation() const
 {
 	// Grab random room location in the level
 	int rows = levelData->GetRows();
@@ -120,11 +144,35 @@ RoomLocation LevelLayout::GetStartRoomLocation() const
 }
 
 //Returns a RoomLocation of one next to roomLocation that has a door already (there may be multiple and it chooses randomly)
-RoomLocation LevelLayout::GetNeighborToAttachTo(const RoomLocation& roomLocation)
+RoomLocation LevelLayout::GetNeighborToAttachTo(const RoomLocation& roomLocation) const
 {
 	std::vector<RoomLocation> possibleAttachPoints = levelData->GetNeighborsWithDoors(roomLocation);
 
 	int indexToSelect = rand() % possibleAttachPoints.size();
 
 	return possibleAttachPoints.at(indexToSelect);
+}
+
+RoomLocation LevelLayout::GetRoomLocationInDirection(const RoomLocation & randomLocation, const DirectionUtils::Direction direction) const
+{
+	RoomLocation neighbor;
+	neighbor.row = randomLocation.row;
+	neighbor.col = randomLocation.col;
+
+	switch (direction) {
+		case DirectionUtils::Direction::NORTH:
+			neighbor.row++;
+			break;
+		case DirectionUtils::Direction::SOUTH:
+			neighbor.row--;
+			break;
+		case DirectionUtils::Direction::EAST:
+			neighbor.col++;
+			break;
+		case DirectionUtils::Direction::WEST:
+			neighbor.col--;
+			break;
+	}
+
+	return neighbor;
 }

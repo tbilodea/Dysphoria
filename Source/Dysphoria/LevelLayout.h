@@ -3,6 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+#include "DirectionUtils.h"
+
 #include <memory>
 
 class LevelData;
@@ -17,7 +20,7 @@ public:
 	LevelLayout();
 	~LevelLayout();
 
-	void Setup(const int rowRooms, const int colRooms);
+	void Setup(const int32 rowRooms, const int32 colRooms);
 
 	//Ensure Setup is called before Build
 	void Build();
@@ -26,6 +29,7 @@ public:
 	std::shared_ptr<LevelData> GetLevelData();
 
 private:
+	const float PERCENTAGE_OF_EXTRA_DOORS = 0.33f;
 	std::shared_ptr<LevelData> levelData = nullptr;
 
 	//Map building methods
@@ -34,7 +38,7 @@ private:
 	void PlaceBossRoom();
 	void AddExtraDoors();
 
-	RoomLocation GetStartRoomLocation() const;
-	RoomLocation GetNeighborToAttachTo(const RoomLocation& roomLocation);
-
+	RoomLocation GetRandomLocation() const;
+	RoomLocation GetNeighborToAttachTo(const RoomLocation& roomLocation) const;
+	RoomLocation GetRoomLocationInDirection(const RoomLocation& randomLocation, const DirectionUtils::Direction direction) const;
 };

@@ -2,6 +2,7 @@
 
 
 #include "LevelData.h"
+
 #include "RoomData.h"
 
 LevelData::LevelData() : ROWS(5), COLS(5), RND_SEED(-1)
@@ -138,6 +139,24 @@ std::vector<RoomLocation> LevelData::GetNeighborsWithoutDoors(const RoomLocation
 	}
 
 	return neighborsWithoutDoors;
+}
+
+std::vector<DirectionUtils::Direction> LevelData::GetDirectionsWithoutDoors(const RoomLocation & roomLocation) const
+{
+	std::vector<DirectionUtils::Direction> withoutDoors = {};
+	auto it = levelRooms.find(roomLocation);
+	if (it == levelRooms.end()) {
+		UE_LOG(LogTemp, Warning, TEXT("Couldn't find room location [%i, %i]"), roomLocation.row, roomLocation.col);
+		return withoutDoors;
+	}
+	auto roomData = it->second;
+	for (auto direction : DirectionUtils::GetAllDirections()) {
+		if ( !(roomData->ConnectedToRoom(direction)) ) {
+			withoutDoors.emplace_back(direction);
+		}
+	}
+
+	return withoutDoors;
 }
 
 int LevelData::GetRows() const
