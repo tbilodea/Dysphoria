@@ -77,17 +77,23 @@ public:
 
 	std::vector<DirectionUtils::Direction> GetDirectionsWithoutDoors(const RoomLocation& roomLocation) const;
 
+	std::vector<RoomLocation> GetRoomsAround(const RoomLocation& roomLocation) const;
+
 	int GetRows() const;
 	int GetCols() const;
 
 	//Methods to manipulate underlying data
 	void AddDoorsBetween(const RoomLocation& room1, const RoomLocation& room2);
-
+	void RemoveDoorsBetween(const RoomLocation& room1, const RoomLocation& room2);
+	void SetEntrance(const RoomLocation room);
+	void SetBossRoom(const RoomLocation room);
 
 private:
 	const int32 ROWS;
 	const int32 COLS;
 	const uint32 RND_SEED;
+	RoomLocation entrance;
+	RoomLocation bossRoom;
 
 	std::map<RoomLocation, std::shared_ptr<RoomData>> levelRooms;
 

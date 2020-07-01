@@ -7,6 +7,7 @@
 #include <vector>
 #include <random>
 #include <time.h>
+#include <cmath>
 
 LevelLayout::LevelLayout()
 {
@@ -88,19 +89,45 @@ void LevelLayout::ConnectAllRooms()
 
 }
 
+//Chosing a first row cell to be the start room
 void LevelLayout::PlaceEntranceRoom() 
 {
-	// TODO
+	RoomLocation entrance;
+	entrance.row = 0;
+	entrance.col = rand() % levelData->GetCols();
+
+	levelData->SetEntrance(entrance);
 }
 
+//Choosing a last row cell to be the end room, connect every room around it, and then connect it just once randomly to one of those rooms
 void LevelLayout::PlaceBossRoom()
 {
-	// TODO
+	RoomLocation bossRoom;
+	bossRoom.row = levelData->GetRows() - 1;
+	bossRoom.col = rand() % levelData->GetCols();
+
+	auto roomsAroundBoss = levelData->GetRoomsAround(bossRoom);
+
+	//Add connections between every room next to each other
+	for (auto& roomAroundBoss : roomsAroundBoss) {
+		for (auto& aSecondRoom : roomsAroundBoss) {
+			if (abs(roomAroundBoss.row - aSecondRoom.row) == 1 || abs(roomAroundBoss.col - aSecondRoom.col) == 1) {
+				levelData->AddDoorsBetween(roomAroundBoss, aSecondRoom);
+			}
+		}
+		//Preemptively disconnect the rooms from the boss room
+		levelData->RemoveDoorsBetween(bossRoom, roomAroundBoss);
+	}
+
+	auto& roomToConnect = roomsAroundBoss.at(rand() % roomsAroundBoss.size());
+
+	levelData->AddDoorsBetween(bossRoom, roomToConnect);
+	levelData->SetBossRoom(bossRoom);
 }
 
 void LevelLayout::AddExtraDoors()
 {
-	// Should probably make this logic more sophisticated since it doesn't scale to the
+	// TODO Should probably make this logic more sophisticated since it doesn't scale to the
 	//amount of cells neighboring, but it'll do for now
 	int32 numberOfRooms = levelData->GetRows() * levelData->GetCols();
 

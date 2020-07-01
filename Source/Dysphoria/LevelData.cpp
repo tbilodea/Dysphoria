@@ -159,6 +159,45 @@ std::vector<DirectionUtils::Direction> LevelData::GetDirectionsWithoutDoors(cons
 	return withoutDoors;
 }
 
+std::vector<RoomLocation> LevelData::GetRoomsAround(const RoomLocation & roomLocation) const
+{
+	std::vector<RoomLocation> roomsAround = GetNeighborsOf(roomLocation);
+
+	//Room in the NE corner
+	if (roomLocation.row + 1 < ROWS && roomLocation.col + 1 < COLS) {
+		RoomLocation neighbor;
+		neighbor.row = roomLocation.row + 1;
+		neighbor.col = roomLocation.col + 1;
+		roomsAround.emplace_back(neighbor);
+	}
+	
+	//Room in the NW corner
+	if (roomLocation.row + 1 < ROWS && roomLocation.col - 1 >= 0) {
+		RoomLocation neighbor;
+		neighbor.row = roomLocation.row + 1;
+		neighbor.col = roomLocation.col - 1;
+		roomsAround.emplace_back(neighbor);
+	}
+
+	//Room in the SE corner
+	if (roomLocation.row - 1 >= 0 && roomLocation.col + 1 < COLS) {
+		RoomLocation neighbor;
+		neighbor.row = roomLocation.row - 1;
+		neighbor.col = roomLocation.col + 1;
+		roomsAround.emplace_back(neighbor);
+	}
+
+	//Room in the SW corner
+	if (roomLocation.row - 1 >= 0 && roomLocation.col - 1 >= 0) {
+		RoomLocation neighbor;
+		neighbor.row = roomLocation.row - 1;
+		neighbor.col = roomLocation.col - 1;
+		roomsAround.emplace_back(neighbor);
+	}
+
+	return roomsAround;
+}
+
 int LevelData::GetRows() const
 {
 	return ROWS;
@@ -198,6 +237,46 @@ void LevelData::AddDoorsBetween(const RoomLocation & room1, const RoomLocation &
 
 	roomData1->AddDoor(direction);
 	roomData2->AddDoor(DirectionUtils::GetOppositeDirection(direction));
+}
+
+void LevelData::RemoveDoorsBetween(const RoomLocation & room1, const RoomLocation & room2)
+{
+	DirectionUtils::Direction direction = GetDirectionBetweenRooms(room1, room2);
+
+	std::shared_ptr<RoomData> roomData1;
+
+	auto it1 = levelRooms.find(room1);
+	if (it1 != levelRooms.end()) {
+		roomData1 = it1->second;
+	}
+	else {
+		UE_LOG(LogTemp, Error, TEXT("Failed to find room at room location [%i, %i]"), room1.row, room1.col);
+		return;
+	}
+
+	std::shared_ptr<RoomData> roomData2;
+
+	auto it2 = levelRooms.find(room2);
+	if (it2 != levelRooms.end()) {
+		roomData2 = it2->second;
+	}
+	else {
+		UE_LOG(LogTemp, Error, TEXT("Failed to find room at room location [%i, %i]"), room2.row, room2.col);
+		return;
+	}
+
+	roomData1->RemoveDoor(direction);
+	roomData2->RemoveDoor(DirectionUtils::GetOppositeDirection(direction));
+}
+
+void LevelData::SetEntrance(const RoomLocation room)
+{
+	entrance = room;
+}
+
+void LevelData::SetBossRoom(const RoomLocation room)
+{
+	bossRoom = room;
 }
 
 //Returns the direction from room1 to room2
