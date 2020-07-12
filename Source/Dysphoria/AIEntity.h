@@ -19,23 +19,24 @@ class DYSPHORIA_API AIEntity
 {
 
 public:
-	void SetAIDirective(const std::shared_ptr<AIDirective>& directive);
+	void SetAIDirective(AIDirective directive);
+
+	AIDirective GetAIDirective() const;
 
 	int32 GetPriority() const;
 	int32 GetWellness() const;
 	bool CanMove() const;
 
-protected:
-	//Must be overridden to be able to grab the location of the object
-	virtual FVector GetLocationCoordinates() = 0;
 
+	//Must be overridden to be able to grab the location of the object
+	virtual FVector GetLocation() = 0;
+
+protected:
 	void Initialize();
 
 	void SetPriority(const int32 priority);
 	void SetWellness(const int32 wellness);
 	void SetCanMove(const bool canMove);
-
-	std::shared_ptr<AIDirective> GetAIDirective() const;
 
 private:
 	
@@ -49,5 +50,5 @@ private:
 	bool canMove = true;
 
 	// The directive state of the entity currently
-	std::shared_ptr<AIDirective> currentDirective;
+	AIDirective* currentDirective = nullptr;
 };

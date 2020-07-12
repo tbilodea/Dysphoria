@@ -17,7 +17,7 @@ public:
 	* (update utilities methods if enemy is added)
 	*/
 	UENUM()
-		enum class EnemyType : uint8 {
+	enum class EnemyType : uint8 {
 		BODY_PARASITE,
 		ADONTIS
 	};

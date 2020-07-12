@@ -18,8 +18,10 @@ public:
 
 	int32 GetWellness() const;
 
+
+	virtual FVector GetLocation() = 0;
+
 protected:
-	virtual FVector GetLocationCoordinates() = 0;
 
 	void SetWellness(const int32 newWellness);
 	void AddDamageTo(const EnemyTypeUtils::EnemyType type, const int32 damage);

@@ -5,12 +5,6 @@
 
 #include "AIDirective.h"
 
-
-void AIEntity::SetAIDirective(const std::shared_ptr<AIDirective>& directive)
-{
-	currentDirective = directive;
-}
-
 int32 AIEntity::GetPriority() const
 {
 	return priority;
@@ -28,7 +22,8 @@ bool AIEntity::CanMove() const
 
 void AIEntity::Initialize()
 {
-	currentDirective = std::make_shared<AIDirective>(AIDirective());
+	AIDirective aiDirective;
+	currentDirective = &aiDirective;
 }
 
 void AIEntity::SetPriority(const int32 newPriority)
@@ -46,8 +41,13 @@ void AIEntity::SetCanMove(const bool newCanMove)
 	canMove = newCanMove;
 }
 
-std::shared_ptr<AIDirective> AIEntity::GetAIDirective() const
+void AIEntity::SetAIDirective(AIDirective directive)
 {
-	return currentDirective;
+	currentDirective = &directive;
+}
+
+AIDirective AIEntity::GetAIDirective() const
+{
+	return *currentDirective;
 }
 

@@ -23,10 +23,13 @@ public:
 		FLEE
 	};
 
-	std::shared_ptr<AIEntity> GetFocus() const;
-	void SetFocus(std::shared_ptr<AIEntity> entity);
+	AIEntity* GetFocus() const;
+	void SetFocus(AIEntity* entity);
+
+	Directive GetDirective() const;
+	void SetDirective(const Directive directive);
 
 private:
 	Directive directive = Directive::ATTACK;
-	std::shared_ptr<AIEntity> focusedEntity = nullptr;
+	AIEntity* focusedEntity = nullptr;
 };

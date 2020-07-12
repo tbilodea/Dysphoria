@@ -12,12 +12,22 @@ AIDirective::~AIDirective()
 {
 }
 
-std::shared_ptr<AIEntity> AIDirective::GetFocus() const
+AIEntity* AIDirective::GetFocus() const
 {
 	return focusedEntity;
 }
 
-void AIDirective::SetFocus(std::shared_ptr<AIEntity> entity)
+void AIDirective::SetFocus(AIEntity * entity)
 {
 	focusedEntity = entity;
+}
+
+AIDirective::Directive AIDirective::GetDirective() const
+{
+	return directive;
+}
+
+void AIDirective::SetDirective(const Directive newDirective)
+{
+	directive = newDirective;
 }

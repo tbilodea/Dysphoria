@@ -20,22 +20,25 @@ public:
 	~SwarmEngine();
 
 	// Adds the list of players
-	void AddPlayers(const std::vector<std::shared_ptr<PlayerEntity>>& allPlayers);
+	void AddPlayers(const std::vector<PlayerEntity*>& allPlayers);
 
 	// Clears the old room enemies out and adds these new ones
-	void AddNewRoomEnemies(const std::vector<std::shared_ptr<AIEntity>>& allRoomEnemies);
+	void AddNewRoomEnemies(const std::vector<AIEntity*>& allRoomEnemies);
 
 	// Add a single enemy (for ones that spawn others)
-	void AddAdditionalRoomEnemy(const std::shared_ptr<AIEntity>& enemyToAdd);
+	void AddAdditionalRoomEnemy(AIEntity& enemyToAdd);
 
 	// Runs the decision tree and updates the AIEntity statuses
 	void RunEngine();
 
 private:
-	std::vector<std::shared_ptr<PlayerEntity>> players;
-	std::vector<std::shared_ptr<AIEntity>> roomEnemies;
+	std::vector<PlayerEntity*> players;
+	std::vector<AIEntity*> roomEnemies;
 
 	void FocusTree();
 
 	void RemoveDeadEnemies();
+	void RemoveUnavailablePlayers();
+
+	PlayerEntity* FindClosestPlayer(FVector location);
 };
