@@ -4,8 +4,11 @@
 
 #include "CoreMinimal.h"
 
+#include <map>
 #include <vector>
 #include <memory>
+
+#include "EnemyClassType.h"
 
 class AIEntity;
 class PlayerEntity;
@@ -35,10 +38,16 @@ private:
 	std::vector<PlayerEntity*> players;
 	std::vector<AIEntity*> roomEnemies;
 
-	void FocusTree();
+	void FocusTree(std::vector<AIEntity*>& toAssignDirective, std::map<EnemyType, std::vector<PlayerEntity*>>& typeToPlayersAboveThreshold);
 
 	void RemoveDeadEnemies();
 	void RemoveUnavailablePlayers();
 
 	PlayerEntity* FindClosestPlayer(FVector location);
+	PlayerEntity* FindClosestPlayer(FVector location, std::vector<PlayerEntity*> playersToCheck);
+
+
+	//Map EnemyType to the Players currently hated by that type
+	std::map<EnemyType, std::vector<PlayerEntity*>> BuildHatedPlayerMap();
+
 };

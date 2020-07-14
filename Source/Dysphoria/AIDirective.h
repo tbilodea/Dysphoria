@@ -6,9 +6,12 @@
 #include <memory>
 
 class AIEntity;
+class PlayerEntity;
 
 /**
  * A directive for the AIEntity objects
+ * 
+ * Should have references for the logic of what the AIEntity should focus on
  */
 class DYSPHORIA_API AIDirective
 {
@@ -24,7 +27,8 @@ public:
 	};
 
 	AIEntity* GetFocus() const;
-	void SetFocus(AIEntity* entity);
+	void SetFriendFocus(AIEntity* entity);
+	void SetPlayerFocus(PlayerEntity* player);
 
 	Directive GetDirective() const;
 	void SetDirective(const Directive directive);
@@ -32,4 +36,6 @@ public:
 private:
 	Directive directive = Directive::ATTACK;
 	AIEntity* focusedEntity = nullptr;
+	PlayerEntity* focusedPlayer = nullptr;
+
 };

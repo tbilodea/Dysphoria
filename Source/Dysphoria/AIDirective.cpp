@@ -17,9 +17,14 @@ AIEntity* AIDirective::GetFocus() const
 	return focusedEntity;
 }
 
-void AIDirective::SetFocus(AIEntity * entity)
+void AIDirective::SetFriendFocus(AIEntity * entity)
 {
 	focusedEntity = entity;
+}
+
+void AIDirective::SetPlayerFocus(PlayerEntity * entity)
+{
+	focusedPlayer = entity;
 }
 
 AIDirective::Directive AIDirective::GetDirective() const

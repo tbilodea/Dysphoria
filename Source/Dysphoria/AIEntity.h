@@ -6,6 +6,7 @@
 
 #include <memory>
 
+enum class EnemyType : uint8;
 class AIDirective;
 
 /**
@@ -30,6 +31,7 @@ public:
 
 	//Must be overridden to be able to grab the location of the object
 	virtual FVector GetLocation() = 0;
+	virtual EnemyType GetEnemyType() = 0;
 
 protected:
 	void Initialize();

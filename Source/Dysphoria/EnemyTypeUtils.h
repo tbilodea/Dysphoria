@@ -3,7 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
 #include <vector>
+#include <memory>
+
+enum class EnemyType : uint8;
+class EnemyData;
 
 /**
  * Enemy type utilities
@@ -11,16 +16,7 @@
 class DYSPHORIA_API EnemyTypeUtils
 {
 public:
-
-	/**
-	* Enum for each class of an enemy
-	* (update utilities methods if enemy is added)
-	*/
-	UENUM()
-	enum class EnemyType : uint8 {
-		BODY_PARASITE,
-		ADONTIS
-	};
-
 	static std::vector<EnemyType> GetAllTypes();
+
+	static std::unique_ptr<EnemyData> GetEnemyData(EnemyType type);
 };
