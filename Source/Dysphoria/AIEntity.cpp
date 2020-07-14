@@ -20,10 +20,15 @@ bool AIEntity::CanMove() const
 	return canMove;
 }
 
+AIEntity::~AIEntity()
+{
+	delete currentDirective;
+}
+
 void AIEntity::Initialize()
 {
-	AIDirective aiDirective;
-	currentDirective = &aiDirective;
+	AIDirective* aiDirective = new AIDirective();
+	currentDirective = aiDirective;
 }
 
 void AIEntity::SetPriority(const int32 newPriority)
@@ -41,9 +46,10 @@ void AIEntity::SetCanMove(const bool newCanMove)
 	canMove = newCanMove;
 }
 
-void AIEntity::SetAIDirective(AIDirective directive)
+void AIEntity::SetAIDirective(AIDirective* directive)
 {
-	currentDirective = &directive;
+	delete currentDirective;
+	currentDirective = directive;
 }
 
 AIDirective AIEntity::GetAIDirective() const

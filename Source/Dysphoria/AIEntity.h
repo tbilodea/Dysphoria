@@ -20,7 +20,7 @@ class DYSPHORIA_API AIEntity
 {
 
 public:
-	void SetAIDirective(AIDirective directive);
+	void SetAIDirective(AIDirective* directive);
 
 	AIDirective GetAIDirective() const;
 
@@ -33,6 +33,7 @@ public:
 	virtual FVector GetLocation() = 0;
 	virtual EnemyType GetEnemyType() = 0;
 
+	virtual ~AIEntity();
 protected:
 	void Initialize();
 

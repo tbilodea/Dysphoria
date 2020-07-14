@@ -35,6 +35,10 @@ public:
 	void RunEngine();
 
 private:
+	//Weights for determining how protectors are assigned
+	const float DISTANCE_WEIGHT = 1.f;
+	const float ASSIGNED_PROTECTORS_WEIGHT = 30.f;
+
 	std::vector<PlayerEntity*> players;
 	std::vector<AIEntity*> roomEnemies;
 
@@ -45,7 +49,7 @@ private:
 
 	PlayerEntity* FindClosestPlayer(FVector location);
 	PlayerEntity* FindClosestPlayer(FVector location, std::vector<PlayerEntity*> playersToCheck);
-
+	AIEntity* FindClosestFriend(FVector location);
 
 	//Map EnemyType to the Players currently hated by that type
 	std::map<EnemyType, std::vector<PlayerEntity*>> BuildHatedPlayerMap();
