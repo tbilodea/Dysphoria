@@ -4,12 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "PlayerEntity.h"
 #include "FirstPersonController.generated.h"
 
 class UCameraComponent;
 
 UCLASS()
-class DYSPHORIA_API AFirstPersonController : public ACharacter
+class DYSPHORIA_API AFirstPersonController : public ACharacter, public PlayerEntity
 {
 	GENERATED_BODY()
 
@@ -27,6 +28,9 @@ public:
 
 	UFUNCTION()
 	void MoveRight(float Value);
+
+	//Exposed location for the Swarm Engine
+	FVector GetLocation() override;
 
 protected:
 
