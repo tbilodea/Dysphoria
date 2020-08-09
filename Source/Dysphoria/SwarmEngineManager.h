@@ -29,7 +29,7 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
-	const float WAIT_TIME = 3000.f;
+	const float WAIT_TIME = 3.f;
 
 	SwarmEngine* SEngine = nullptr;
 	float LastUpdateTime = 0.f;
