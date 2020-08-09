@@ -23,13 +23,13 @@ public:
 	~SwarmEngine();
 
 	// Adds the list of players
-	void AddPlayers(const std::vector<PlayerEntity*>& allPlayers);
+	void AddPlayers(const std::vector<PlayerEntity*>& AllPlayers);
 
 	// Clears the old room enemies out and adds these new ones
-	void AddNewRoomEnemies(const std::vector<AIEntity*>& allRoomEnemies);
+	void AddNewRoomEnemies(const std::vector<AIEntity*>& AllRoomEnemies);
 
 	// Add a single enemy (for ones that spawn others)
-	void AddAdditionalRoomEnemy(AIEntity& enemyToAdd);
+	void AddAdditionalRoomEnemy(AIEntity& EnemyToAdd);
 
 	// Runs the decision tree and updates the AIEntity statuses
 	void RunEngine();
@@ -39,17 +39,17 @@ private:
 	const float DISTANCE_WEIGHT = 1.f;
 	const float ASSIGNED_PROTECTORS_WEIGHT = 30.f;
 
-	std::vector<PlayerEntity*> players;
-	std::vector<AIEntity*> roomEnemies;
+	std::vector<PlayerEntity*> Players;
+	std::vector<AIEntity*> RoomEnemies;
 
-	void FocusTree(std::vector<AIEntity*>& toAssignDirective, std::map<EnemyType, std::vector<PlayerEntity*>>& typeToPlayersAboveThreshold);
+	void FocusTree(std::vector<AIEntity*>& ToAssignDirective, std::map<EnemyType, std::vector<PlayerEntity*>>& TypeToPlayersAboveThreshold);
 
 	void RemoveDeadEnemies();
 	void RemoveUnavailablePlayers();
 
-	PlayerEntity* FindClosestPlayer(FVector location);
-	PlayerEntity* FindClosestPlayer(FVector location, std::vector<PlayerEntity*> playersToCheck);
-	AIEntity* FindClosestFriend(FVector location);
+	PlayerEntity* FindClosestPlayer(FVector Location);
+	PlayerEntity* FindClosestPlayer(FVector Location, std::vector<PlayerEntity*> PlayersToCheck);
+	AIEntity* FindClosestFriend(FVector Location);
 
 	//Map EnemyType to the Players currently hated by that type
 	std::map<EnemyType, std::vector<PlayerEntity*>> BuildHatedPlayerMap();

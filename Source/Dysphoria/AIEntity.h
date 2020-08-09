@@ -7,7 +7,7 @@
 #include <memory>
 
 enum class EnemyType : uint8;
-class AIDirective;
+struct FSwarmDirective;
 
 /**
  * Abstract class for the data associated with an entity that needs to take generic AI decisions
@@ -20,13 +20,13 @@ class DYSPHORIA_API AIEntity
 {
 
 public:
-	void SetAIDirective(AIDirective* directive);
+	void SetAIDirective(FSwarmDirective* directive);
 
-	AIDirective GetAIDirective() const;
+	FSwarmDirective GetAIDirective() const;
 
 	int32 GetPriority() const;
 	int32 GetWellness() const;
-	bool CanMove() const;
+	bool GetCanMove() const;
 
 
 	//Must be overridden to be able to grab the location of the object
@@ -37,21 +37,21 @@ public:
 protected:
 	void Initialize();
 
-	void SetPriority(const int32 priority);
-	void SetWellness(const int32 wellness);
-	void SetCanMove(const bool canMove);
+	void SetPriority(const int32 Priority);
+	void SetWellness(const int32 Wellness);
+	void SetCanMove(const bool CanMove);
 
 private:
 	
 	// Priority level to keep alive (AI enemy) or kill (player)
-	int32 priority = 1;
+	int32 Priority = 1;
 
 	// Current entity wellness (0-100)
-	int32 wellness = 100;
+	int32 Wellness = 100;
 
 	// If this entity can move around
-	bool canMove = true;
+	bool CanMove = true;
 
 	// The directive state of the entity currently
-	AIDirective* currentDirective = nullptr;
+	FSwarmDirective* CurrentDirective = nullptr;
 };

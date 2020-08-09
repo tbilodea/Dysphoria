@@ -3,57 +3,58 @@
 
 #include "AIEntity.h"
 
-#include "AIDirective.h"
+#include "SwarmDirective.h"
 
 int32 AIEntity::GetPriority() const
 {
-	return priority;
+	return Priority;
 }
 
 int32 AIEntity::GetWellness() const
 {
-	return wellness;
+	return Wellness;
 }
 
-bool AIEntity::CanMove() const
+bool AIEntity::GetCanMove() const
 {
-	return canMove;
+	return CanMove;
 }
 
 AIEntity::~AIEntity()
 {
-	delete currentDirective;
+	delete CurrentDirective;
 }
 
 void AIEntity::Initialize()
 {
-	AIDirective* aiDirective = new AIDirective();
-	currentDirective = aiDirective;
+	FSwarmDirective* AiDirective, Dir;
+	AiDirective = &Dir;
+	CurrentDirective = AiDirective;
 }
 
-void AIEntity::SetPriority(const int32 newPriority)
+void AIEntity::SetPriority(const int32 NewPriority)
 {
-	priority = newPriority;
+	Priority = NewPriority;
 }
 
-void AIEntity::SetWellness(const int32 newWellness)
+void AIEntity::SetWellness(const int32 NewWellness)
 {
-	wellness = newWellness;
+	Wellness = NewWellness;
 }
 
-void AIEntity::SetCanMove(const bool newCanMove)
+void AIEntity::SetCanMove(const bool NewCanMove)
 {
-	canMove = newCanMove;
+	CanMove = NewCanMove;
 }
 
-void AIEntity::SetAIDirective(AIDirective* directive)
+void AIEntity::SetAIDirective(FSwarmDirective* Directive)
 {
-	delete currentDirective;
-	currentDirective = directive;
+	delete CurrentDirective;
+	CurrentDirective = Directive;
 }
 
-AIDirective AIEntity::GetAIDirective() const
+FSwarmDirective AIEntity::GetAIDirective() const
 {
-	return *currentDirective;
+	return *CurrentDirective;
 }
 
