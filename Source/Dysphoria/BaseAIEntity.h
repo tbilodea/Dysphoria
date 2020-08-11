@@ -8,10 +8,10 @@
 
 #include "BaseAIEntity.generated.h"
 
-enum class EnemyType : uint8;
+enum class EEnemyType : uint8;
 
 UCLASS()
-class DYSPHORIA_API ABaseAIEntity : public AActor, public AIEntity
+class DYSPHORIA_API ABaseAIEntity : public AAIEntity
 {
 	GENERATED_BODY()
 	
@@ -20,8 +20,8 @@ public:
 	ABaseAIEntity();
 
 	//Swarm Engine methods
-	FVector GetLocation() override;
-	EnemyType GetEnemyType() override;
+	FVector GetLocation();
+	EEnemyType GetEnemyType();
 
 protected:
 	// Called when the game starts or when spawned

@@ -5,7 +5,7 @@
 
 #include "EnemyTypeUtils.h"
 
-PlayerEntity::PlayerEntity()
+APlayerEntity::APlayerEntity()
 {
 	for (auto enemyType : EnemyTypeUtils::GetAllTypes())
 	{
@@ -14,16 +14,12 @@ PlayerEntity::PlayerEntity()
 	}
 }
 
-PlayerEntity::~PlayerEntity()
-{
-}
-
-int32 PlayerEntity::GetWellness() const
+int32 APlayerEntity::GetWellness() const
 {
 	return wellness;
 }
 
-int32 PlayerEntity::GetKillsOn(EnemyType & type)
+int32 APlayerEntity::GetKillsOn(EEnemyType & type)
 {
 	auto it = killsToEnemies.find(type);
 	if (it == killsToEnemies.end()) {
@@ -32,12 +28,12 @@ int32 PlayerEntity::GetKillsOn(EnemyType & type)
 	return it->second;
 }
 
-void PlayerEntity::SetWellness(const int32 newWellness)
+void APlayerEntity::SetWellness(const int32 newWellness)
 {
 	wellness = newWellness;
 }
 
-void PlayerEntity::AddDamageTo(const EnemyType type, const int32 damage)
+void APlayerEntity::AddDamageTo(const EEnemyType type, const int32 damage)
 {
 	auto it = damageToEnemies.find(type);
 	if (it != damageToEnemies.end()) {

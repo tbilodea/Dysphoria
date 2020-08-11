@@ -3,10 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameFramework/Character.h"
+#include "EnemyClasstype.h"
 
 #include <memory>
 
-enum class EnemyType : uint8;
+#include "AIEntity.generated.h"
+
 struct FSwarmDirective;
 
 /**
@@ -16,8 +19,10 @@ struct FSwarmDirective;
  *
  * Defaults to priority=1, wellness=100, canMove=true
  */
-class DYSPHORIA_API AIEntity
+UCLASS(Abstract, BlueprintType)
+class DYSPHORIA_API AAIEntity : public ACharacter
 {
+	GENERATED_BODY()
 
 public:
 	void SetAIDirective(FSwarmDirective* directive);
@@ -28,12 +33,14 @@ public:
 	int32 GetWellness() const;
 	bool GetCanMove() const;
 
-
 	//Must be overridden to be able to grab the location of the object
-	virtual FVector GetLocation() = 0;
-	virtual EnemyType GetEnemyType() = 0;
+	UFUNCTION(BlueprintImplementableEvent)
+	FVector GetLocation();
 
-	virtual ~AIEntity();
+	UFUNCTION(BlueprintImplementableEvent)
+	EEnemyType GetEnemyType();
+
+	virtual ~AAIEntity();
 protected:
 	void Initialize();
 

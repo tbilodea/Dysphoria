@@ -7,7 +7,7 @@
 #include <vector>
 #include <memory>
 
-enum class EnemyType : uint8;
+enum class EEnemyType : uint8;
 class EnemyData;
 
 /**
@@ -16,7 +16,7 @@ class EnemyData;
 class DYSPHORIA_API EnemyTypeUtils
 {
 public:
-	static std::vector<EnemyType> GetAllTypes();
+	static std::vector<EEnemyType> GetAllTypes();
 
-	static std::unique_ptr<EnemyData> GetEnemyData(EnemyType type);
+	static std::unique_ptr<EnemyData> GetEnemyData(EEnemyType type);
 };

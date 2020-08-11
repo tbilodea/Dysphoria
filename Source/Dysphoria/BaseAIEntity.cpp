@@ -17,10 +17,10 @@ FVector ABaseAIEntity::GetLocation()
 	return this->GetActorLocation();
 }
 
-EnemyType ABaseAIEntity::GetEnemyType()
+EEnemyType ABaseAIEntity::GetEnemyType()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Returned BODY PARASITE on abstract class BaseAIEntity.cpp, TODO clean this up"));
-	return EnemyType::BODY_PARASITE;
+	return EEnemyType::BODY_PARASITE;
 }
 
 // Called when the game starts or when spawned

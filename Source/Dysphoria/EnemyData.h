@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include <vector>
 
-enum class EnemyType : uint8;
+enum class EEnemyType : uint8;
 
 /**
  * Basic data about an enemy type
@@ -13,10 +13,10 @@ enum class EnemyType : uint8;
 class DYSPHORIA_API EnemyData
 {
 public:
-	EnemyData(EnemyType type);
+	EnemyData(EEnemyType type);
 	~EnemyData();
 
-	EnemyType GetType() const;
+	EEnemyType GetType() const;
 	int32 GetHateLimit() const;
 	
 	//int32 of enemies killed before "hate", int32 of base health
@@ -24,7 +24,7 @@ public:
 
 private:
 	//The type of enemy this class represents
-	EnemyType type;
+	EEnemyType type;
 
 	//Limit of killed enemies of this type before "hate" activates in the SwarmEngine logic
 	int32 hateLimit = 0;

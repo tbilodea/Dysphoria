@@ -19,21 +19,21 @@ SwarmEngine::~SwarmEngine()
 {
 }
 
-void SwarmEngine::AddPlayers(const std::vector<PlayerEntity*>& allPlayers)
+void SwarmEngine::AddPlayers(const std::vector<APlayerEntity*>& allPlayers)
 {
 	Players.clear();
 
 	Players.insert(allPlayers.begin(), allPlayers.end(), allPlayers.end());
 }
 
-void SwarmEngine::AddNewRoomEnemies(const std::vector<AIEntity*>& newRoomEnemies)
+void SwarmEngine::AddNewRoomEnemies(const std::vector<AAIEntity*>& newRoomEnemies)
 {
 	RoomEnemies.clear();
 
 	RoomEnemies.insert(newRoomEnemies.begin(), newRoomEnemies.end(), newRoomEnemies.end());
 }
 
-void SwarmEngine::AddAdditionalRoomEnemy(AIEntity& enemyToAdd)
+void SwarmEngine::AddAdditionalRoomEnemy(AAIEntity& enemyToAdd)
 {
 	RoomEnemies.push_back(&enemyToAdd);
 }
@@ -44,15 +44,15 @@ void SwarmEngine::RunEngine()
 	RemoveDeadEnemies();
 	RemoveUnavailablePlayers();
 
-	std::map<EnemyType, std::vector<PlayerEntity*>> TypeToPlayersAboveThreshold = BuildHatedPlayerMap();
+	std::map<EEnemyType, std::vector<APlayerEntity*>> TypeToPlayersAboveThreshold = BuildHatedPlayerMap();
 
 	// Check number of AI
 	if (RoomEnemies.size() == 1) {
 		FocusTree(RoomEnemies, TypeToPlayersAboveThreshold);
 	}
 	else {
-		std::vector<AIEntity*> Protectees = {};
-		std::vector<AIEntity*> Protectors = {};
+		std::vector<AAIEntity*> Protectees = {};
+		std::vector<AAIEntity*> Protectors = {};
 		//Determine which have reached "protection level" which is priority 1 or priority 2 if the wellness hits a mark
 		//(They should be generated in a kind of "order")
 		for (auto& RoomEnemy : RoomEnemies) {
@@ -72,7 +72,7 @@ void SwarmEngine::RunEngine()
 		}
 		else {
 			//We do the protector/protectee logic otherwise
-			std::map<AIEntity*, std::vector<AIEntity*>> ProtecteesToProtectors;
+			std::map<AAIEntity*, std::vector<AAIEntity*>> ProtecteesToProtectors;
 
 			//A protectee will be assigned to find the nearest friend
 			for (auto Protectee : Protectees) {
@@ -84,13 +84,13 @@ void SwarmEngine::RunEngine()
 
 				Protectee->SetAIDirective(Directive);
 
-				std::vector<AIEntity*> newVector = {};
+				std::vector<AAIEntity*> newVector = {};
 				ProtecteesToProtectors.insert(std::make_pair(Protectee, newVector));
 			}
 
 			//Protectors will be assigned based upon a weighted distance and amount of pre-assigned protectors
 			for (auto Protector : Protectors) {
-				AIEntity* MinProtectee = nullptr;
+				AAIEntity* MinProtectee = nullptr;
 				float MinVal = std::numeric_limits<float>::max();
 				for (auto Protectee : Protectees) {
 					float Dist = FVector::Dist(Protectee->GetLocation(), Protector->GetLocation());
@@ -126,19 +126,19 @@ void SwarmEngine::RunEngine()
 	}
 }
 
-void SwarmEngine::FocusTree(std::vector<AIEntity*>& ToAssignDirective, std::map<EnemyType, std::vector<PlayerEntity*>>& typeToPlayersAboveThreshold)
+void SwarmEngine::FocusTree(std::vector<AAIEntity*>& ToAssignDirective, std::map<EEnemyType, std::vector<APlayerEntity*>>& typeToPlayersAboveThreshold)
 {
-	PlayerEntity* MostVaunerable = nullptr;
+	APlayerEntity* MostVaunerable = nullptr;
 	
 	//Track most vaunerable player
-	for (PlayerEntity* Player : Players) {
+	for (APlayerEntity* Player : Players) {
 		if (!MostVaunerable || Player->GetWellness() < MostVaunerable->GetWellness()) {
 			MostVaunerable = Player;
 		}
 	}
 
 	//Assign the directives
-	for (AIEntity* Entity : ToAssignDirective) {
+	for (AAIEntity* Entity : ToAssignDirective) {
 		FSwarmDirective *Directive, Dir;
 		Directive = &Dir;
 
@@ -148,7 +148,7 @@ void SwarmEngine::FocusTree(std::vector<AIEntity*>& ToAssignDirective, std::map<
 			auto HatedPlayers = Iter->second;
 			
 			if (HatedPlayers.size() > 0) {
-				PlayerEntity* ClosestHated = FindClosestPlayer(Entity->GetLocation(), HatedPlayers);
+				APlayerEntity* ClosestHated = FindClosestPlayer(Entity->GetLocation(), HatedPlayers);
 				Directive->FocusedPlayer = ClosestHated;
 				Entity->SetAIDirective(Directive);
 
@@ -160,7 +160,7 @@ void SwarmEngine::FocusTree(std::vector<AIEntity*>& ToAssignDirective, std::map<
 		if (Entity->GetCanMove() && Entity->GetWellness() > 50) {
 			Directive->FocusedPlayer = MostVaunerable;
 		} else {
-			PlayerEntity* Player = FindClosestPlayer(Entity->GetLocation());
+			APlayerEntity* Player = FindClosestPlayer(Entity->GetLocation());
 			Directive->FocusedPlayer = Player;
 		}
 
@@ -170,9 +170,9 @@ void SwarmEngine::FocusTree(std::vector<AIEntity*>& ToAssignDirective, std::map<
 
 void SwarmEngine::RemoveDeadEnemies()
 {
-	std::vector<AIEntity*> NewRoomEnemies;
+	std::vector<AAIEntity*> NewRoomEnemies;
 
-	std::copy_if(RoomEnemies.begin(), RoomEnemies.end(), std::back_inserter(NewRoomEnemies), [](AIEntity* Entity) { return Entity->GetWellness() > 0; });
+	std::copy_if(RoomEnemies.begin(), RoomEnemies.end(), std::back_inserter(NewRoomEnemies), [](AAIEntity* Entity) { return Entity->GetWellness() > 0; });
 
 	RoomEnemies.clear();
 
@@ -182,24 +182,24 @@ void SwarmEngine::RemoveDeadEnemies()
 void SwarmEngine::RemoveUnavailablePlayers()
 {
 	//TODO -- remove players with 0 health or fully disconnected
-	std::vector<PlayerEntity*> NewPlayerList;
+	std::vector<APlayerEntity*> NewPlayerList;
 
-	std::copy_if(Players.begin(), Players.end(), std::back_inserter(NewPlayerList), [](PlayerEntity* Player) { return Player->GetWellness() > 0; });
+	std::copy_if(Players.begin(), Players.end(), std::back_inserter(NewPlayerList), [](APlayerEntity* Player) { return Player->GetWellness() > 0; });
 
 	Players.clear();
 
 	Players.insert(NewPlayerList.begin(), NewPlayerList.end(), NewPlayerList.end());
 }
 
-PlayerEntity * SwarmEngine::FindClosestPlayer(FVector Location) {
+APlayerEntity * SwarmEngine::FindClosestPlayer(FVector Location) {
 	return FindClosestPlayer(Location, Players);
 }
 
-PlayerEntity * SwarmEngine::FindClosestPlayer(FVector Location, std::vector<PlayerEntity*> PlayersToCheck)
+APlayerEntity * SwarmEngine::FindClosestPlayer(FVector Location, std::vector<APlayerEntity*> PlayersToCheck)
 {
-	PlayerEntity* Closest = nullptr;
+	APlayerEntity* Closest = nullptr;
 	float ClosestDist = -1;
-	for (PlayerEntity* Player : PlayersToCheck) {
+	for (APlayerEntity* Player : PlayersToCheck) {
 		float Distance = FVector::Dist(Location, Player->GetLocation());
 
 		if (!Closest || Distance < ClosestDist) {
@@ -210,9 +210,9 @@ PlayerEntity * SwarmEngine::FindClosestPlayer(FVector Location, std::vector<Play
 	return Closest;
 }
 
-AIEntity * SwarmEngine::FindClosestFriend(FVector Location)
+AAIEntity * SwarmEngine::FindClosestFriend(FVector Location)
 {
-	AIEntity* Closest = nullptr;
+	AAIEntity* Closest = nullptr;
 	float ClosestDist = -1;
 	for (auto Entity : RoomEnemies) {
 		float Distance = FVector::Dist(Location, Entity->GetLocation());
@@ -226,15 +226,15 @@ AIEntity * SwarmEngine::FindClosestFriend(FVector Location)
 }
 
 //Build map of EnemyType -> Players that are above the "hate" threshold
-std::map<EnemyType, std::vector<PlayerEntity*>> SwarmEngine::BuildHatedPlayerMap() 
+std::map<EEnemyType, std::vector<APlayerEntity*>> SwarmEngine::BuildHatedPlayerMap() 
 {
-	std::map<EnemyType, std::vector<PlayerEntity*>> TypeToPlayersAboveThreshold;
+	std::map<EEnemyType, std::vector<APlayerEntity*>> TypeToPlayersAboveThreshold;
 	for (auto Type : EnemyTypeUtils::GetAllTypes()) {
 		auto EnemyData = EnemyTypeUtils::GetEnemyData(Type);
-		std::vector<PlayerEntity*> PlayersAboveKillThreshold = {};
+		std::vector<APlayerEntity*> PlayersAboveKillThreshold = {};
 
 		std::copy_if(Players.begin(), Players.end(), std::back_inserter(PlayersAboveKillThreshold),
-			[&Type, &EnemyData](PlayerEntity* Entity) {return Entity->GetKillsOn(Type) >= EnemyData->GetHateLimit(); });
+			[&Type, &EnemyData](APlayerEntity* Entity) {return Entity->GetKillsOn(Type) >= EnemyData->GetHateLimit(); });
 
 		TypeToPlayersAboveThreshold.insert(std::make_pair(Type, PlayersAboveKillThreshold));
 	}

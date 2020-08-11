@@ -19,7 +19,12 @@ USTRUCT(BlueprintType)
 struct FSwarmDirective {
 	GENERATED_BODY()
 
+	UPROPERTY()
 	EDirective Directive = EDirective::ATTACK;
-	AIEntity* FocusedEntity = nullptr;
-	PlayerEntity* FocusedPlayer = nullptr;
+
+	UPROPERTY()
+	AAIEntity* FocusedEntity = nullptr;
+
+	UPROPERTY()
+	APlayerEntity* FocusedPlayer = nullptr;
 };

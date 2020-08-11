@@ -10,8 +10,8 @@
 
 #include "EnemyClassType.h"
 
-class AIEntity;
-class PlayerEntity;
+class AAIEntity;
+class APlayerEntity;
 
 /**
  * The hive mind to figure out what each AIEntity needs to do to counter players
@@ -23,13 +23,13 @@ public:
 	~SwarmEngine();
 
 	// Adds the list of players
-	void AddPlayers(const std::vector<PlayerEntity*>& AllPlayers);
+	void AddPlayers(const std::vector<APlayerEntity*>& AllPlayers);
 
 	// Clears the old room enemies out and adds these new ones
-	void AddNewRoomEnemies(const std::vector<AIEntity*>& AllRoomEnemies);
+	void AddNewRoomEnemies(const std::vector<AAIEntity*>& AllRoomEnemies);
 
 	// Add a single enemy (for ones that spawn others)
-	void AddAdditionalRoomEnemy(AIEntity& EnemyToAdd);
+	void AddAdditionalRoomEnemy(AAIEntity& EnemyToAdd);
 
 	// Runs the decision tree and updates the AIEntity statuses
 	void RunEngine();
@@ -39,19 +39,19 @@ private:
 	const float DISTANCE_WEIGHT = 1.f;
 	const float ASSIGNED_PROTECTORS_WEIGHT = 30.f;
 
-	std::vector<PlayerEntity*> Players;
-	std::vector<AIEntity*> RoomEnemies;
+	std::vector<APlayerEntity*> Players;
+	std::vector<AAIEntity*> RoomEnemies;
 
-	void FocusTree(std::vector<AIEntity*>& ToAssignDirective, std::map<EnemyType, std::vector<PlayerEntity*>>& TypeToPlayersAboveThreshold);
+	void FocusTree(std::vector<AAIEntity*>& ToAssignDirective, std::map<EEnemyType, std::vector<APlayerEntity*>>& TypeToPlayersAboveThreshold);
 
 	void RemoveDeadEnemies();
 	void RemoveUnavailablePlayers();
 
-	PlayerEntity* FindClosestPlayer(FVector Location);
-	PlayerEntity* FindClosestPlayer(FVector Location, std::vector<PlayerEntity*> PlayersToCheck);
-	AIEntity* FindClosestFriend(FVector Location);
+	APlayerEntity* FindClosestPlayer(FVector Location);
+	APlayerEntity* FindClosestPlayer(FVector Location, std::vector<APlayerEntity*> PlayersToCheck);
+	AAIEntity* FindClosestFriend(FVector Location);
 
 	//Map EnemyType to the Players currently hated by that type
-	std::map<EnemyType, std::vector<PlayerEntity*>> BuildHatedPlayerMap();
+	std::map<EEnemyType, std::vector<APlayerEntity*>> BuildHatedPlayerMap();
 
 };

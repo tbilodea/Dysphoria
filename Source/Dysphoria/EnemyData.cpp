@@ -4,7 +4,7 @@
 #include "EnemyData.h"
 #include "EnemyClassType.h"
 
-EnemyData::EnemyData(EnemyType newType)
+EnemyData::EnemyData(EEnemyType newType)
 {
 	type = newType;
 }
@@ -13,7 +13,7 @@ EnemyData::~EnemyData()
 {
 }
 
-EnemyType EnemyData::GetType() const
+EEnemyType EnemyData::GetType() const
 {
 	return type;
 }

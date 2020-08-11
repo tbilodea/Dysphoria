@@ -10,7 +10,7 @@
 class UCameraComponent;
 
 UCLASS()
-class DYSPHORIA_API AFirstPersonController : public ACharacter, public PlayerEntity
+class DYSPHORIA_API AFirstPersonController : public APlayerEntity
 {
 	GENERATED_BODY()
 
@@ -30,7 +30,7 @@ public:
 	void MoveRight(float Value);
 
 	//Exposed location for the Swarm Engine
-	FVector GetLocation() override;
+	FVector GetLocation();
 
 protected:
 
