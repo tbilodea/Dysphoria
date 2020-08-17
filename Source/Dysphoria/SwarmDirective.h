@@ -1,4 +1,4 @@
-#pragma
+#pragma once
 
 #include "CoreMinimal.h"
 
@@ -10,21 +10,22 @@
 
 UENUM(BlueprintType)
 enum class EDirective : uint8 {
-	ATTACK,
-	DEFEND,
-	FLEE
+	ATTACK UMETA(DisplayName = "Attack"),
+	DEFEND UMETA(DisplayName = "Defend"),
+	FLEE UMETA(DisplayName = "Flee")
 };
 
-USTRUCT(BlueprintType)
-struct FSwarmDirective {
+UCLASS(BlueprintType)
+class USwarmDirective : public UObject {
 	GENERATED_BODY()
 
-	UPROPERTY()
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EDirective Directive = EDirective::ATTACK;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	AAIEntity* FocusedEntity = nullptr;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	APlayerEntity* FocusedPlayer = nullptr;
 };

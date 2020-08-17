@@ -76,7 +76,7 @@ void SwarmEngine::RunEngine()
 
 			//A protectee will be assigned to find the nearest friend
 			for (auto Protectee : Protectees) {
-				FSwarmDirective *Directive, Dir;
+				USwarmDirective *Directive, Dir;
 				Directive = &Dir;
 				Directive->Directive = EDirective::FLEE;
 				Directive->FocusedPlayer = FindClosestPlayer(Protectee->GetLocation());
@@ -114,7 +114,7 @@ void SwarmEngine::RunEngine()
 				(it->second).push_back(Protector);
 
 				//Make and assign the directive for the protector
-				FSwarmDirective *Directive, Dir;
+				USwarmDirective *Directive, Dir;
 				Directive = &Dir;
 				Directive->FocusedEntity = MinProtectee;
 				Directive->FocusedPlayer = FindClosestPlayer(Protector->GetLocation());
@@ -139,7 +139,7 @@ void SwarmEngine::FocusTree(std::vector<AAIEntity*>& ToAssignDirective, std::map
 
 	//Assign the directives
 	for (AAIEntity* Entity : ToAssignDirective) {
-		FSwarmDirective *Directive, Dir;
+		USwarmDirective *Directive, Dir;
 		Directive = &Dir;
 
 		//Set directives for the hateful entities

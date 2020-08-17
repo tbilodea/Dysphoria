@@ -26,7 +26,7 @@ AAIEntity::~AAIEntity()
 
 void AAIEntity::Initialize()
 {
-	FSwarmDirective* AiDirective, Dir;
+	USwarmDirective* AiDirective, Dir;
 	AiDirective = &Dir;
 	CurrentDirective = AiDirective;
 }
@@ -46,14 +46,14 @@ void AAIEntity::SetCanMove(const bool NewCanMove)
 	CanMove = NewCanMove;
 }
 
-void AAIEntity::SetAIDirective(FSwarmDirective* Directive)
+void AAIEntity::SetAIDirective(USwarmDirective* Directive)
 {
 	delete CurrentDirective;
 	CurrentDirective = Directive;
 }
 
-FSwarmDirective AAIEntity::GetAIDirective() const
+USwarmDirective* AAIEntity::GetAIDirective()
 {
-	return *CurrentDirective;
+	return CurrentDirective;
 }
 

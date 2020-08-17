@@ -5,12 +5,11 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "EnemyClasstype.h"
-
 #include <memory>
 
 #include "AIEntity.generated.h"
 
-struct FSwarmDirective;
+class USwarmDirective;
 
 /**
  * Abstract class for the data associated with an entity that needs to take generic AI decisions
@@ -25,9 +24,10 @@ class DYSPHORIA_API AAIEntity : public ACharacter
 	GENERATED_BODY()
 
 public:
-	void SetAIDirective(FSwarmDirective* directive);
+	void SetAIDirective(USwarmDirective* directive);
 
-	FSwarmDirective GetAIDirective() const;
+	UFUNCTION(BlueprintCallable)
+	USwarmDirective* GetAIDirective();
 
 	int32 GetPriority() const;
 	int32 GetWellness() const;
@@ -60,5 +60,5 @@ private:
 	bool CanMove = true;
 
 	// The directive state of the entity currently
-	FSwarmDirective* CurrentDirective = nullptr;
+	USwarmDirective* CurrentDirective = nullptr;
 };
