@@ -40,8 +40,8 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	EEnemyType GetEnemyType();
 
-	virtual ~AAIEntity();
 protected:
+	UFUNCTION(BlueprintCallable)
 	void Initialize();
 
 	void SetPriority(const int32 Priority);

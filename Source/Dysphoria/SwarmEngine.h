@@ -9,6 +9,7 @@
 #include <memory>
 
 #include "EnemyClassType.h"
+#include "SwarmEngine.generated.h"
 
 class AAIEntity;
 class APlayerEntity;
@@ -16,12 +17,12 @@ class APlayerEntity;
 /**
  * The hive mind to figure out what each AIEntity needs to do to counter players
  */
-class DYSPHORIA_API SwarmEngine
+UCLASS()
+class DYSPHORIA_API USwarmEngine : public UObject
 {
-public:
-	SwarmEngine();
-	~SwarmEngine();
+	GENERATED_BODY()
 
+public:
 	// Adds the list of players
 	void AddPlayers(const std::vector<APlayerEntity*>& AllPlayers);
 

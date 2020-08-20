@@ -19,15 +19,9 @@ bool AAIEntity::GetCanMove() const
 	return CanMove;
 }
 
-AAIEntity::~AAIEntity()
-{
-	delete CurrentDirective;
-}
-
 void AAIEntity::Initialize()
 {
-	USwarmDirective* AiDirective, Dir;
-	AiDirective = &Dir;
+	USwarmDirective* AiDirective = NewObject<USwarmDirective>();
 	CurrentDirective = AiDirective;
 }
 

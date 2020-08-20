@@ -14,11 +14,10 @@ ASwarmEngineManager::ASwarmEngineManager()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	
-	SEngine = new SwarmEngine();
+	SEngine = NewObject<USwarmEngine>();
 }
 
 ASwarmEngineManager::~ASwarmEngineManager() {
-	delete SEngine;
 }
 
 // Called when the game starts or when spawned
@@ -62,9 +61,8 @@ void ASwarmEngineManager::AddRoomEnemies() {
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseAIEntity::StaticClass(), FoundActors);
 	std::vector<AAIEntity*> enemies = {};
 	for (auto Enemy : FoundActors) {
-		UE_LOG(LogTemp, Warning, TEXT("Adding players %s"), *(GetDebugName(Enemy)));
-
 		enemies.push_back((AAIEntity*) static_cast<ABaseAIEntity*>(Enemy));
 	}
+
 	SEngine->AddNewRoomEnemies(enemies);
 }

@@ -4,6 +4,8 @@
 #include "SwarmEngine.h"
 
 #include <limits>
+#include <algorithm>
+#include <iterator>
 
 #include "AIEntity.h"
 #include "PlayerEntity.h"
@@ -11,46 +13,43 @@
 #include "EnemyTypeUtils.h"
 #include "EnemyData.h"
 
-SwarmEngine::SwarmEngine()
-{
-}
-
-SwarmEngine::~SwarmEngine()
-{
-}
-
-void SwarmEngine::AddPlayers(const std::vector<APlayerEntity*>& allPlayers)
+void USwarmEngine::AddPlayers(const std::vector<APlayerEntity*>& allPlayers)
 {
 	Players.clear();
 
 	Players.insert(allPlayers.begin(), allPlayers.end(), allPlayers.end());
 }
 
-void SwarmEngine::AddNewRoomEnemies(const std::vector<AAIEntity*>& newRoomEnemies)
+void USwarmEngine::AddNewRoomEnemies(const std::vector<AAIEntity*>& NewRoomEnemies)
 {
 	RoomEnemies.clear();
 
-	RoomEnemies.insert(newRoomEnemies.begin(), newRoomEnemies.end(), newRoomEnemies.end());
+	RoomEnemies.insert(NewRoomEnemies.begin(), NewRoomEnemies.end(), NewRoomEnemies.end());
 }
 
-void SwarmEngine::AddAdditionalRoomEnemy(AAIEntity& enemyToAdd)
+void USwarmEngine::AddAdditionalRoomEnemy(AAIEntity& enemyToAdd)
 {
 	RoomEnemies.push_back(&enemyToAdd);
 }
 
 //Updates the AIDirectives for each entity
-void SwarmEngine::RunEngine()
+void USwarmEngine::RunEngine()
 {
 	RemoveDeadEnemies();
 	RemoveUnavailablePlayers();
 
 	std::map<EEnemyType, std::vector<APlayerEntity*>> TypeToPlayersAboveThreshold = BuildHatedPlayerMap();
 
+	UE_LOG(LogTemp, Warning, TEXT("checking how many enemies"));
+	
 	// Check number of AI
 	if (RoomEnemies.size() == 1) {
+		UE_LOG(LogTemp, Warning, TEXT("room enemies is 1"));
 		FocusTree(RoomEnemies, TypeToPlayersAboveThreshold);
 	}
 	else {
+		UE_LOG(LogTemp, Warning, TEXT("room enemies is above 1"));
+
 		std::vector<AAIEntity*> Protectees = {};
 		std::vector<AAIEntity*> Protectors = {};
 		//Determine which have reached "protection level" which is priority 1 or priority 2 if the wellness hits a mark
@@ -76,8 +75,7 @@ void SwarmEngine::RunEngine()
 
 			//A protectee will be assigned to find the nearest friend
 			for (auto Protectee : Protectees) {
-				USwarmDirective *Directive, Dir;
-				Directive = &Dir;
+				USwarmDirective * Directive = NewObject<USwarmDirective>();
 				Directive->Directive = EDirective::FLEE;
 				Directive->FocusedPlayer = FindClosestPlayer(Protectee->GetLocation());
 				Directive->FocusedEntity = FindClosestFriend(Protectee->GetLocation());
@@ -114,11 +112,12 @@ void SwarmEngine::RunEngine()
 				(it->second).push_back(Protector);
 
 				//Make and assign the directive for the protector
-				USwarmDirective *Directive, Dir;
-				Directive = &Dir;
+				USwarmDirective * Directive = NewObject<USwarmDirective>();
 				Directive->FocusedEntity = MinProtectee;
 				Directive->FocusedPlayer = FindClosestPlayer(Protector->GetLocation());
 				Directive->Directive = EDirective::DEFEND;
+				
+				UE_LOG(LogTemp, Warning, TEXT("Defending player closest is %s"), *(Directive->FocusedPlayer->GetName()));
 
 				Protector->SetAIDirective(Directive);
 			}
@@ -126,7 +125,7 @@ void SwarmEngine::RunEngine()
 	}
 }
 
-void SwarmEngine::FocusTree(std::vector<AAIEntity*>& ToAssignDirective, std::map<EEnemyType, std::vector<APlayerEntity*>>& typeToPlayersAboveThreshold)
+void USwarmEngine::FocusTree(std::vector<AAIEntity*>& ToAssignDirective, std::map<EEnemyType, std::vector<APlayerEntity*>>& typeToPlayersAboveThreshold)
 {
 	APlayerEntity* MostVaunerable = nullptr;
 	
@@ -139,8 +138,7 @@ void SwarmEngine::FocusTree(std::vector<AAIEntity*>& ToAssignDirective, std::map
 
 	//Assign the directives
 	for (AAIEntity* Entity : ToAssignDirective) {
-		USwarmDirective *Directive, Dir;
-		Directive = &Dir;
+		USwarmDirective * Directive = NewObject<USwarmDirective>();
 
 		//Set directives for the hateful entities
 		auto Iter = typeToPlayersAboveThreshold.find(Entity->GetEnemyType());
@@ -165,10 +163,15 @@ void SwarmEngine::FocusTree(std::vector<AAIEntity*>& ToAssignDirective, std::map
 		}
 
 		Entity->SetAIDirective(Directive);
+
+		if (Directive->FocusedPlayer) {
+			UE_LOG(LogTemp, Warning, TEXT("focusing a player %s"), *(Directive->FocusedPlayer->GetName()));
+		}
+		UE_LOG(LogTemp, Warning, TEXT("focus a player called"));
 	}
 }
 
-void SwarmEngine::RemoveDeadEnemies()
+void USwarmEngine::RemoveDeadEnemies()
 {
 	std::vector<AAIEntity*> NewRoomEnemies;
 
@@ -176,10 +179,10 @@ void SwarmEngine::RemoveDeadEnemies()
 
 	RoomEnemies.clear();
 
-	RoomEnemies.insert(NewRoomEnemies.begin(), NewRoomEnemies.end(), NewRoomEnemies.end());
+	RoomEnemies = NewRoomEnemies;
 }
 
-void SwarmEngine::RemoveUnavailablePlayers()
+void USwarmEngine::RemoveUnavailablePlayers()
 {
 	//TODO -- remove players with 0 health or fully disconnected
 	std::vector<APlayerEntity*> NewPlayerList;
@@ -191,11 +194,11 @@ void SwarmEngine::RemoveUnavailablePlayers()
 	Players.insert(NewPlayerList.begin(), NewPlayerList.end(), NewPlayerList.end());
 }
 
-APlayerEntity * SwarmEngine::FindClosestPlayer(FVector Location) {
+APlayerEntity * USwarmEngine::FindClosestPlayer(FVector Location) {
 	return FindClosestPlayer(Location, Players);
 }
 
-APlayerEntity * SwarmEngine::FindClosestPlayer(FVector Location, std::vector<APlayerEntity*> PlayersToCheck)
+APlayerEntity * USwarmEngine::FindClosestPlayer(FVector Location, std::vector<APlayerEntity*> PlayersToCheck)
 {
 	APlayerEntity* Closest = nullptr;
 	float ClosestDist = -1;
@@ -210,7 +213,7 @@ APlayerEntity * SwarmEngine::FindClosestPlayer(FVector Location, std::vector<APl
 	return Closest;
 }
 
-AAIEntity * SwarmEngine::FindClosestFriend(FVector Location)
+AAIEntity * USwarmEngine::FindClosestFriend(FVector Location)
 {
 	AAIEntity* Closest = nullptr;
 	float ClosestDist = -1;
@@ -226,7 +229,7 @@ AAIEntity * SwarmEngine::FindClosestFriend(FVector Location)
 }
 
 //Build map of EnemyType -> Players that are above the "hate" threshold
-std::map<EEnemyType, std::vector<APlayerEntity*>> SwarmEngine::BuildHatedPlayerMap() 
+std::map<EEnemyType, std::vector<APlayerEntity*>> USwarmEngine::BuildHatedPlayerMap() 
 {
 	std::map<EEnemyType, std::vector<APlayerEntity*>> TypeToPlayersAboveThreshold;
 	for (auto Type : EnemyTypeUtils::GetAllTypes()) {

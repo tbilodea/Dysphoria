@@ -6,7 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "SwarmEngineManager.generated.h"
 
-class SwarmEngine;
+class USwarmEngine;
 
 UCLASS(BlueprintType)
 class DYSPHORIA_API ASwarmEngineManager : public AActor
@@ -31,7 +31,7 @@ protected:
 private:
 	const float WAIT_TIME = 3.f;
 
-	SwarmEngine* SEngine = nullptr;
+	USwarmEngine* SEngine = nullptr;
 	float LastUpdateTime = 0.f;
 	float AccumulatedTime = 0.f;
 };
