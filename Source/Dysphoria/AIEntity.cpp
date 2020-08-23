@@ -42,7 +42,6 @@ void AAIEntity::SetCanMove(const bool NewCanMove)
 
 void AAIEntity::SetAIDirective(USwarmDirective* Directive)
 {
-	delete CurrentDirective;
 	CurrentDirective = Directive;
 }
 

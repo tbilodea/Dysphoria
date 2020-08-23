@@ -3,33 +3,25 @@
 
 #include "SwarmEngine.h"
 
-#include <limits>
-#include <algorithm>
-#include <iterator>
-
 #include "AIEntity.h"
 #include "PlayerEntity.h"
 #include "SwarmDirective.h"
 #include "EnemyTypeUtils.h"
 #include "EnemyData.h"
 
-void USwarmEngine::AddPlayers(const std::vector<APlayerEntity*>& allPlayers)
+void USwarmEngine::AddPlayers(TArray<APlayerEntity*> AllPlayers)
 {
-	Players.clear();
-
-	Players.insert(allPlayers.begin(), allPlayers.end(), allPlayers.end());
+	Players.Append(AllPlayers);
 }
 
-void USwarmEngine::AddNewRoomEnemies(const std::vector<AAIEntity*>& NewRoomEnemies)
+void USwarmEngine::AddNewRoomEnemies(TArray<AAIEntity*> NewRoomEnemies)
 {
-	RoomEnemies.clear();
-
-	RoomEnemies.insert(NewRoomEnemies.begin(), NewRoomEnemies.end(), NewRoomEnemies.end());
+	RoomEnemies.Append(NewRoomEnemies);
 }
 
-void USwarmEngine::AddAdditionalRoomEnemy(AAIEntity& enemyToAdd)
+void USwarmEngine::AddAdditionalRoomEnemy(AAIEntity* enemyToAdd)
 {
-	RoomEnemies.push_back(&enemyToAdd);
+	RoomEnemies.Add(enemyToAdd);
 }
 
 //Updates the AIDirectives for each entity
@@ -38,12 +30,14 @@ void USwarmEngine::RunEngine()
 	RemoveDeadEnemies();
 	RemoveUnavailablePlayers();
 
-	std::map<EEnemyType, std::vector<APlayerEntity*>> TypeToPlayersAboveThreshold = BuildHatedPlayerMap();
+	if (Players.Num() == 0) { return; }
+
+	std::map<EEnemyType, TArray<APlayerEntity*>> TypeToPlayersAboveThreshold = BuildHatedPlayerMap();
 
 	UE_LOG(LogTemp, Warning, TEXT("checking how many enemies"));
 	
 	// Check number of AI
-	if (RoomEnemies.size() == 1) {
+	if (RoomEnemies.Num() == 1) {
 		UE_LOG(LogTemp, Warning, TEXT("room enemies is 1"));
 		FocusTree(RoomEnemies, TypeToPlayersAboveThreshold);
 	}
@@ -125,13 +119,14 @@ void USwarmEngine::RunEngine()
 	}
 }
 
-void USwarmEngine::FocusTree(std::vector<AAIEntity*>& ToAssignDirective, std::map<EEnemyType, std::vector<APlayerEntity*>>& typeToPlayersAboveThreshold)
+void USwarmEngine::FocusTree(TArray<AAIEntity*>& ToAssignDirective, std::map<EEnemyType, TArray<APlayerEntity*>>& typeToPlayersAboveThreshold)
 {
 	APlayerEntity* MostVaunerable = nullptr;
 	
 	//Track most vaunerable player
 	for (APlayerEntity* Player : Players) {
 		if (!MostVaunerable || Player->GetWellness() < MostVaunerable->GetWellness()) {
+			UE_LOG(LogTemp, Warning, TEXT("currentmostvaunerableplayer %s"), *(Player->GetName()));
 			MostVaunerable = Player;
 		}
 	}
@@ -142,10 +137,10 @@ void USwarmEngine::FocusTree(std::vector<AAIEntity*>& ToAssignDirective, std::ma
 
 		//Set directives for the hateful entities
 		auto Iter = typeToPlayersAboveThreshold.find(Entity->GetEnemyType());
-		if (Iter != typeToPlayersAboveThreshold.end() && (Iter->second).size() != 0) {
+		if (Iter != typeToPlayersAboveThreshold.end() && (Iter->second).Num() != 0) {
 			auto HatedPlayers = Iter->second;
 			
-			if (HatedPlayers.size() > 0) {
+			if (HatedPlayers.Num() > 0) {
 				APlayerEntity* ClosestHated = FindClosestPlayer(Entity->GetLocation(), HatedPlayers);
 				Directive->FocusedPlayer = ClosestHated;
 				Entity->SetAIDirective(Directive);
@@ -157,48 +152,51 @@ void USwarmEngine::FocusTree(std::vector<AAIEntity*>& ToAssignDirective, std::ma
 		//Default directives to the most vaunerable if entity is well, otherwise attack closest player
 		if (Entity->GetCanMove() && Entity->GetWellness() > 50) {
 			Directive->FocusedPlayer = MostVaunerable;
+			UE_LOG(LogTemp, Warning, TEXT("assigning most vaunerable player"));
 		} else {
 			APlayerEntity* Player = FindClosestPlayer(Entity->GetLocation());
 			Directive->FocusedPlayer = Player;
+			UE_LOG(LogTemp, Warning, TEXT("assigning closest player"));
 		}
 
 		Entity->SetAIDirective(Directive);
-
-		if (Directive->FocusedPlayer) {
-			UE_LOG(LogTemp, Warning, TEXT("focusing a player %s"), *(Directive->FocusedPlayer->GetName()));
-		}
-		UE_LOG(LogTemp, Warning, TEXT("focus a player called"));
 	}
 }
 
 void USwarmEngine::RemoveDeadEnemies()
 {
-	std::vector<AAIEntity*> NewRoomEnemies;
+	TArray<AAIEntity*> NewRoomEnemies = {};
 
-	std::copy_if(RoomEnemies.begin(), RoomEnemies.end(), std::back_inserter(NewRoomEnemies), [](AAIEntity* Entity) { return Entity->GetWellness() > 0; });
+	for (auto& Entity : RoomEnemies) {
+		if (Entity->GetWellness() > 0) {
+			NewRoomEnemies.Add(Entity);
+		}
+	}
 
-	RoomEnemies.clear();
-
-	RoomEnemies = NewRoomEnemies;
+	RoomEnemies.Empty();
+	RoomEnemies.Append(NewRoomEnemies);
 }
 
 void USwarmEngine::RemoveUnavailablePlayers()
 {
 	//TODO -- remove players with 0 health or fully disconnected
-	std::vector<APlayerEntity*> NewPlayerList;
+	TArray<APlayerEntity*> NewPlayerList = {};
 
-	std::copy_if(Players.begin(), Players.end(), std::back_inserter(NewPlayerList), [](APlayerEntity* Player) { return Player->GetWellness() > 0; });
+	for (auto& Player : Players) {
+		if (Player->GetWellness() > 0) {
+			NewPlayerList.Add(Player);
+		}
+	}
 
-	Players.clear();
-
-	Players.insert(NewPlayerList.begin(), NewPlayerList.end(), NewPlayerList.end());
+	Players.Empty();
+	Players.Append(NewPlayerList);
 }
 
 APlayerEntity * USwarmEngine::FindClosestPlayer(FVector Location) {
 	return FindClosestPlayer(Location, Players);
 }
 
-APlayerEntity * USwarmEngine::FindClosestPlayer(FVector Location, std::vector<APlayerEntity*> PlayersToCheck)
+APlayerEntity * USwarmEngine::FindClosestPlayer(FVector Location, TArray<APlayerEntity*> PlayersToCheck)
 {
 	APlayerEntity* Closest = nullptr;
 	float ClosestDist = -1;
@@ -229,16 +227,19 @@ AAIEntity * USwarmEngine::FindClosestFriend(FVector Location)
 }
 
 //Build map of EnemyType -> Players that are above the "hate" threshold
-std::map<EEnemyType, std::vector<APlayerEntity*>> USwarmEngine::BuildHatedPlayerMap() 
+std::map<EEnemyType, TArray<APlayerEntity*>> USwarmEngine::BuildHatedPlayerMap()
 {
-	std::map<EEnemyType, std::vector<APlayerEntity*>> TypeToPlayersAboveThreshold;
+	std::map<EEnemyType, TArray<APlayerEntity*>> TypeToPlayersAboveThreshold;
 	for (auto Type : EnemyTypeUtils::GetAllTypes()) {
 		auto EnemyData = EnemyTypeUtils::GetEnemyData(Type);
-		std::vector<APlayerEntity*> PlayersAboveKillThreshold = {};
+		TArray<APlayerEntity*> PlayersAboveKillThreshold = {};
 
-		std::copy_if(Players.begin(), Players.end(), std::back_inserter(PlayersAboveKillThreshold),
-			[&Type, &EnemyData](APlayerEntity* Entity) {return Entity->GetKillsOn(Type) >= EnemyData->GetHateLimit(); });
-
+		for (auto Player : Players) {
+			if (Player->GetKillsOn(Type) >= EnemyData->GetHateLimit()) {
+				PlayersAboveKillThreshold.Add(Player);
+			}
+		}
+		
 		TypeToPlayersAboveThreshold.insert(std::make_pair(Type, PlayersAboveKillThreshold));
 	}
 	return TypeToPlayersAboveThreshold;

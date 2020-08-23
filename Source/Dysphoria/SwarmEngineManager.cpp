@@ -48,20 +48,19 @@ void ASwarmEngineManager::AddPlayers() {
 
 	TArray<AActor*> FoundActors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AFirstPersonController::StaticClass(), FoundActors);
-	std::vector<APlayerEntity*> allPlayers = {};
+	TArray<APlayerEntity*> allPlayers;
 	for (auto Actor : FoundActors) {
-		UE_LOG(LogTemp, Warning, TEXT("Adding players %s"), *(GetDebugName(Actor)));
-		allPlayers.push_back(static_cast<AFirstPersonController*>(Actor));
-	}	
+		allPlayers.Add((AFirstPersonController*) Actor);
+	}
 	SEngine->AddPlayers(allPlayers);
 }
 
 void ASwarmEngineManager::AddRoomEnemies() {
 	TArray<AActor*> FoundActors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseAIEntity::StaticClass(), FoundActors);
-	std::vector<AAIEntity*> enemies = {};
+	TArray<AAIEntity*> enemies;
 	for (auto Enemy : FoundActors) {
-		enemies.push_back((AAIEntity*) static_cast<ABaseAIEntity*>(Enemy));
+		enemies.Add((AAIEntity*) Enemy);
 	}
 
 	SEngine->AddNewRoomEnemies(enemies);
