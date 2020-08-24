@@ -28,4 +28,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	APlayerEntity* FocusedPlayer = nullptr;
+
+	FString ToString() {
+		FString ObjectString("Directive [");
+		ObjectString.Append(UEnum::GetValueAsString(Directive) + ", ");
+		ObjectString.Append("FocusedEntity =" + (FocusedEntity ? FocusedEntity->GetName() : "NULLPTR") + " , ");
+		ObjectString.Append("FocusedPlayer =" + (FocusedPlayer ? FocusedPlayer->GetName() : "NULLPTR") + "]");
+		return ObjectString;
+	}
 };

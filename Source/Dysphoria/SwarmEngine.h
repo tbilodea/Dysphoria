@@ -24,13 +24,13 @@ class DYSPHORIA_API USwarmEngine : public UObject
 
 public:
 	// Adds the list of players
-	void AddPlayers(const std::vector<APlayerEntity*>& AllPlayers);
+	void AddPlayers(TArray<APlayerEntity*> AllPlayers);
 
 	// Clears the old room enemies out and adds these new ones
-	void AddNewRoomEnemies(const std::vector<AAIEntity*>& AllRoomEnemies);
+	void AddNewRoomEnemies(TArray<AAIEntity*> AllRoomEnemies);
 
 	// Add a single enemy (for ones that spawn others)
-	void AddAdditionalRoomEnemy(AAIEntity& EnemyToAdd);
+	void AddAdditionalRoomEnemy(AAIEntity* EnemyToAdd);
 
 	// Runs the decision tree and updates the AIEntity statuses
 	void RunEngine();
@@ -40,19 +40,19 @@ private:
 	const float DISTANCE_WEIGHT = 1.f;
 	const float ASSIGNED_PROTECTORS_WEIGHT = 30.f;
 
-	std::vector<APlayerEntity*> Players;
-	std::vector<AAIEntity*> RoomEnemies;
+	TArray<APlayerEntity*> Players = TArray<APlayerEntity*>();
+	TArray<AAIEntity*> RoomEnemies = TArray<AAIEntity*>();
 
-	void FocusTree(std::vector<AAIEntity*>& ToAssignDirective, std::map<EEnemyType, std::vector<APlayerEntity*>>& TypeToPlayersAboveThreshold);
+	void FocusTree(TArray<AAIEntity*>& ToAssignDirective, std::map<EEnemyType, TArray<APlayerEntity*>>& TypeToPlayersAboveThreshold);
 
 	void RemoveDeadEnemies();
 	void RemoveUnavailablePlayers();
 
 	APlayerEntity* FindClosestPlayer(FVector Location);
-	APlayerEntity* FindClosestPlayer(FVector Location, std::vector<APlayerEntity*> PlayersToCheck);
+	APlayerEntity* FindClosestPlayer(FVector Location, TArray<APlayerEntity*> PlayersToCheck);
 	AAIEntity* FindClosestFriend(FVector Location);
 
 	//Map EnemyType to the Players currently hated by that type
-	std::map<EEnemyType, std::vector<APlayerEntity*>> BuildHatedPlayerMap();
+	std::map<EEnemyType, TArray<APlayerEntity*>> BuildHatedPlayerMap();
 
 };
