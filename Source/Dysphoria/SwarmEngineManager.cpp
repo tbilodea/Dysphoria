@@ -12,9 +12,7 @@
 ASwarmEngineManager::ASwarmEngineManager()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-	
-	SEngine = NewObject<USwarmEngine>();
+	PrimaryActorTick.bCanEverTick = true;	
 }
 
 ASwarmEngineManager::~ASwarmEngineManager() {
@@ -24,6 +22,8 @@ ASwarmEngineManager::~ASwarmEngineManager() {
 void ASwarmEngineManager::BeginPlay()
 {
 	Super::BeginPlay();
+
+	SEngine = NewObject<USwarmEngine>();
 
 	AddPlayers();
 	AddRoomEnemies();
@@ -49,7 +49,7 @@ void ASwarmEngineManager::AddPlayers() {
 	TArray<AActor*> FoundActors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AFirstPersonController::StaticClass(), FoundActors);
 	TArray<APlayerEntity*> allPlayers;
-	for (auto Actor : FoundActors) {
+	for (auto& Actor : FoundActors) {
 		allPlayers.Add((AFirstPersonController*) Actor);
 	}
 	SEngine->AddPlayers(allPlayers);
@@ -59,7 +59,7 @@ void ASwarmEngineManager::AddRoomEnemies() {
 	TArray<AActor*> FoundActors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ABaseAIEntity::StaticClass(), FoundActors);
 	TArray<AAIEntity*> enemies;
-	for (auto Enemy : FoundActors) {
+	for (auto& Enemy : FoundActors) {
 		enemies.Add((AAIEntity*) Enemy);
 	}
 

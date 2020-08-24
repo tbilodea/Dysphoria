@@ -38,6 +38,6 @@ private:
 	std::map<EEnemyType, int32> killsToEnemies = std::map<EEnemyType, int32>();
 
 	//wellness of player
-	int32 wellness;
+	int32 wellness = 100;
 	
 };

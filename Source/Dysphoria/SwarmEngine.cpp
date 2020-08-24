@@ -8,6 +8,7 @@
 #include "SwarmDirective.h"
 #include "EnemyTypeUtils.h"
 #include "EnemyData.h"
+#include "Dysphoria.h"
 
 void USwarmEngine::AddPlayers(TArray<APlayerEntity*> AllPlayers)
 {
@@ -30,37 +31,41 @@ void USwarmEngine::RunEngine()
 	RemoveDeadEnemies();
 	RemoveUnavailablePlayers();
 
-	if (Players.Num() == 0) { return; }
+	if (Players.Num() == 0 || RoomEnemies.Num() == 0) { return; }
 
 	std::map<EEnemyType, TArray<APlayerEntity*>> TypeToPlayersAboveThreshold = BuildHatedPlayerMap();
 
-	UE_LOG(LogTemp, Warning, TEXT("checking how many enemies"));
+	UE_LOG(LogSwarmEngine, Log, TEXT("checking how many enemies"));
 	
 	// Check number of AI
 	if (RoomEnemies.Num() == 1) {
-		UE_LOG(LogTemp, Warning, TEXT("room enemies is 1"));
+		UE_LOG(LogSwarmEngine, Log, TEXT("Room enemies is 1"));
 		FocusTree(RoomEnemies, TypeToPlayersAboveThreshold);
 	}
 	else {
-		UE_LOG(LogTemp, Warning, TEXT("room enemies is above 1"));
+		UE_LOG(LogSwarmEngine, Log, TEXT("Room enemies is above 1"));
 
-		std::vector<AAIEntity*> Protectees = {};
-		std::vector<AAIEntity*> Protectors = {};
+		TArray<AAIEntity*> Protectees;
+		TArray<AAIEntity*> Protectors;
 		//Determine which have reached "protection level" which is priority 1 or priority 2 if the wellness hits a mark
 		//(They should be generated in a kind of "order")
 		for (auto& RoomEnemy : RoomEnemies) {
 			if (RoomEnemy->GetPriority() == 1) {
-				Protectees.insert(Protectees.begin(), RoomEnemy);
+				Protectees.Insert(RoomEnemy, 0);
+				UE_LOG(LogSwarmEngine, Verbose, TEXT("%s is a high priority protectee"), *RoomEnemy->GetName());
 			}else if (RoomEnemy->GetPriority() == 2 && RoomEnemy->GetWellness() < 50) {
-				Protectees.push_back(RoomEnemy);
+				Protectees.Add(RoomEnemy);
+				UE_LOG(LogSwarmEngine, Verbose, TEXT("%s is a protectee"), *RoomEnemy->GetName());
 			}
 			else {
-				Protectors.push_back(RoomEnemy);
+				Protectors.Add(RoomEnemy);
+				UE_LOG(LogSwarmEngine, Verbose, TEXT("%s is a protector"), *RoomEnemy->GetName());
 			}
 		}
 
 		//If we're all protectors or protectees, just go for the focus
-		if (Protectees.size() == 0 || Protectors.size() == 0) {
+		if (Protectees.Num() == 0 || Protectors.Num() == 0) {
+			UE_LOG(LogSwarmEngine, Log, TEXT("All protectees or protectors, using FocusTree"));
 			FocusTree(RoomEnemies, TypeToPlayersAboveThreshold);
 		}
 		else {
@@ -75,6 +80,7 @@ void USwarmEngine::RunEngine()
 				Directive->FocusedEntity = FindClosestFriend(Protectee->GetLocation());
 
 				Protectee->SetAIDirective(Directive);
+				UE_LOG(LogSwarmEngine, Log, TEXT("%s protectee entity [PlayerFocus of %s] [Friend to defend %s]"), *Protectee->GetName(), Directive->FocusedPlayer ? *Directive->FocusedPlayer->GetName() : *FString("null"), Directive->FocusedEntity ? *Directive->FocusedEntity->GetName() : *FString("null"));
 
 				std::vector<AAIEntity*> newVector = {};
 				ProtecteesToProtectors.insert(std::make_pair(Protectee, newVector));
@@ -110,9 +116,8 @@ void USwarmEngine::RunEngine()
 				Directive->FocusedEntity = MinProtectee;
 				Directive->FocusedPlayer = FindClosestPlayer(Protector->GetLocation());
 				Directive->Directive = EDirective::DEFEND;
-				
-				UE_LOG(LogTemp, Warning, TEXT("Defending player closest is %s"), *(Directive->FocusedPlayer->GetName()));
 
+				UE_LOG(LogSwarmEngine, Log, TEXT("%s protector entity has %s"), *Protector->GetName(), *Directive->ToString());
 				Protector->SetAIDirective(Directive);
 			}
 		}
@@ -126,8 +131,8 @@ void USwarmEngine::FocusTree(TArray<AAIEntity*>& ToAssignDirective, std::map<EEn
 	//Track most vaunerable player
 	for (APlayerEntity* Player : Players) {
 		if (!MostVaunerable || Player->GetWellness() < MostVaunerable->GetWellness()) {
-			UE_LOG(LogTemp, Warning, TEXT("currentmostvaunerableplayer %s"), *(Player->GetName()));
 			MostVaunerable = Player;
+			UE_LOG(LogSwarmEngine, Log, TEXT("Current Most Vaunerable Player %s"), *(Player->GetName()));
 		}
 	}
 
@@ -145,6 +150,7 @@ void USwarmEngine::FocusTree(TArray<AAIEntity*>& ToAssignDirective, std::map<EEn
 				Directive->FocusedPlayer = ClosestHated;
 				Entity->SetAIDirective(Directive);
 
+				UE_LOG(LogSwarmEngine, Verbose, TEXT("Entity %s hates Player %s"), *Entity->GetName(), *ClosestHated->GetName());
 				continue;
 			}
 		}
@@ -152,12 +158,14 @@ void USwarmEngine::FocusTree(TArray<AAIEntity*>& ToAssignDirective, std::map<EEn
 		//Default directives to the most vaunerable if entity is well, otherwise attack closest player
 		if (Entity->GetCanMove() && Entity->GetWellness() > 50) {
 			Directive->FocusedPlayer = MostVaunerable;
-			UE_LOG(LogTemp, Warning, TEXT("assigning most vaunerable player"));
+			UE_LOG(LogSwarmEngine, Verbose, TEXT("Assigning most vaunerable player %s"), *MostVaunerable->GetName(), *Entity->GetName());
 		} else {
 			APlayerEntity* Player = FindClosestPlayer(Entity->GetLocation());
 			Directive->FocusedPlayer = Player;
-			UE_LOG(LogTemp, Warning, TEXT("assigning closest player"));
+			UE_LOG(LogSwarmEngine, Verbose, TEXT("Assigning closest player %s"), *Player->GetName());
 		}
+
+		UE_LOG(LogSwarmEngine, Log, TEXT("%s generic assigned entity has %s"), *Entity->GetName(), *Directive->ToString());
 
 		Entity->SetAIDirective(Directive);
 	}
@@ -165,11 +173,12 @@ void USwarmEngine::FocusTree(TArray<AAIEntity*>& ToAssignDirective, std::map<EEn
 
 void USwarmEngine::RemoveDeadEnemies()
 {
-	TArray<AAIEntity*> NewRoomEnemies = {};
+	TArray<AAIEntity*> NewRoomEnemies = TArray<AAIEntity*>();
 
 	for (auto& Entity : RoomEnemies) {
 		if (Entity->GetWellness() > 0) {
 			NewRoomEnemies.Add(Entity);
+			UE_LOG(LogSwarmEngine, VeryVerbose, TEXT("Room Enemies list refreshed with %s"), *Entity->GetName());
 		}
 	}
 
@@ -180,11 +189,12 @@ void USwarmEngine::RemoveDeadEnemies()
 void USwarmEngine::RemoveUnavailablePlayers()
 {
 	//TODO -- remove players with 0 health or fully disconnected
-	TArray<APlayerEntity*> NewPlayerList = {};
+	TArray<APlayerEntity*> NewPlayerList = TArray<APlayerEntity*>();
 
 	for (auto& Player : Players) {
 		if (Player->GetWellness() > 0) {
 			NewPlayerList.Add(Player);
+			UE_LOG(LogSwarmEngine, VeryVerbose, TEXT("Players list refreshed with %s"), *Player->GetName());
 		}
 	}
 
@@ -208,6 +218,8 @@ APlayerEntity * USwarmEngine::FindClosestPlayer(FVector Location, TArray<APlayer
 			ClosestDist = Distance;
 		}
 	}
+	UE_LOG(LogSwarmEngine, VeryVerbose, TEXT("Closest player found is %s"), Closest ? *Closest->GetName() : *FString("null"));
+
 	return Closest;
 }
 
@@ -223,6 +235,7 @@ AAIEntity * USwarmEngine::FindClosestFriend(FVector Location)
 			ClosestDist = Distance;
 		}
 	}
+	UE_LOG(LogSwarmEngine, VeryVerbose, TEXT("Closest Friend found is %s"), Closest ? *Closest->GetName() : *FString("null"));
 	return Closest;
 }
 
@@ -242,5 +255,6 @@ std::map<EEnemyType, TArray<APlayerEntity*>> USwarmEngine::BuildHatedPlayerMap()
 		
 		TypeToPlayersAboveThreshold.insert(std::make_pair(Type, PlayersAboveKillThreshold));
 	}
+	UE_LOG(LogSwarmEngine, VeryVerbose, TEXT("Amount of players above hate threshold is %i"), TypeToPlayersAboveThreshold.size());
 	return TypeToPlayersAboveThreshold;
 }
