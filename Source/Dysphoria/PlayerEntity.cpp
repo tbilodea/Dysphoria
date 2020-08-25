@@ -10,19 +10,19 @@ APlayerEntity::APlayerEntity()
 	for (auto enemyType : EnemyTypeUtils::GetAllTypes())
 	{
 		int32 zero = 0;
-		damageToEnemies.insert(std::make_pair(enemyType, zero));
+		DamageToEnemies.insert(std::make_pair(enemyType, zero));
 	}
 }
 
 int32 APlayerEntity::GetWellness() const
 {
-	return wellness;
+	return Wellness;
 }
 
 int32 APlayerEntity::GetKillsOn(EEnemyType & type)
 {
-	auto it = killsToEnemies.find(type);
-	if (it == killsToEnemies.end()) {
+	auto it = KillsToEnemies.find(type);
+	if (it == KillsToEnemies.end()) {
 		return 0;
 	}
 	return it->second;
@@ -30,13 +30,13 @@ int32 APlayerEntity::GetKillsOn(EEnemyType & type)
 
 void APlayerEntity::SetWellness(const int32 newWellness)
 {
-	wellness = newWellness;
+	Wellness = newWellness;
 }
 
 void APlayerEntity::AddDamageTo(const EEnemyType type, const int32 damage)
 {
-	auto it = damageToEnemies.find(type);
-	if (it != damageToEnemies.end()) {
+	auto it = DamageToEnemies.find(type);
+	if (it != DamageToEnemies.end()) {
 		it->second = it->second + damage;
 	}
 }

@@ -34,10 +34,10 @@ protected:
 
 private:
 	//Damage done to enemy types
-	std::map<EEnemyType, int32> damageToEnemies = std::map<EEnemyType, int32>();
-	std::map<EEnemyType, int32> killsToEnemies = std::map<EEnemyType, int32>();
+	std::map<EEnemyType, int32> DamageToEnemies = std::map<EEnemyType, int32>();
+	std::map<EEnemyType, int32> KillsToEnemies = std::map<EEnemyType, int32>();
 
 	//wellness of player
-	int32 wellness = 100;
+	int32 Wellness = 100;
 	
 };
