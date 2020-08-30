@@ -134,3 +134,8 @@ void AFirstPersonController::Fire()
 		}
 	}
 }
+
+FVector AFirstPersonController::GetLocation()
+{
+	return this->GetActorLocation();
+}
