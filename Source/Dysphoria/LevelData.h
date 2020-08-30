@@ -8,20 +8,25 @@
 #include <memory>
 #include <map>
 
-class RoomData;
+#include "LevelData.generated.h"
+
+class URoomData;
 
 /*
 * Struct for defining each rooms location, since this is data that doesn't need to be in the RoomData
 */
-struct RoomLocation {
+USTRUCT()
+struct FRoomLocation {
+	GENERATED_BODY()
+
 	int32 row;
 	int32 col;
 
-	bool operator==(const RoomLocation& rhs) const {
+	bool operator==(const FRoomLocation& rhs) const {
 		return row == rhs.row && col == rhs.col;
 	}
 
-	bool operator>(const RoomLocation& rhs) const {
+	bool operator>(const FRoomLocation& rhs) const {
 		if (row != rhs.row) {
 			if (row > rhs.row) {
 				return true;
@@ -34,7 +39,7 @@ struct RoomLocation {
 		return col > rhs.col;
 	}
 
-	bool operator<(const RoomLocation& rhs) const {
+	bool operator<(const FRoomLocation& rhs) const {
 		if (row != rhs.row) {
 			if (row < rhs.row) {
 				return true;
@@ -54,48 +59,47 @@ struct RoomLocation {
  * Row/Col definitions of the RoomLocation are based in Quadrant I ([0,0] being the bottomleft or SOUTH-WEST corner)
  * 
  */
-class DYSPHORIA_API LevelData
+UCLASS()
+class DYSPHORIA_API ULevelData : public UObject
 {
+	GENERATED_BODY()
 public:
-	LevelData();
-	LevelData(const int32 rows, const int32 cols, const uint32 seed);
-	~LevelData();
 
 	//Returns copy of levelRooms
-	std::map<RoomLocation, std::shared_ptr<RoomData>> GetAllRoomDatas();
+	std::map<FRoomLocation, URoomData*> GetAllRoomDatas();
 
 	//Returns a pointer to the RoomData at row/col
-	std::shared_ptr<RoomData> GetRoomData(const int row, const int col);
+	URoomData* GetRoomData(const int row, const int col);
 
-	void InitializeLevelDataMap();
+	void InitializeLevelDataMap(int32 rows, int32 cols, uint32 seed);
 
-	std::vector<RoomLocation> GetNeighborsOf(const RoomLocation& roomLocation) const;
+	std::vector<FRoomLocation> GetNeighborsOf(const FRoomLocation& roomLocation) const;
 
-	std::vector<RoomLocation> GetNeighborsWithDoors(const RoomLocation& roomLocation) const;
+	std::vector<FRoomLocation> GetNeighborsWithDoors(const FRoomLocation& roomLocation) const;
 
-	std::vector<RoomLocation> GetNeighborsWithoutDoors(const RoomLocation& roomLocation) const;
+	std::vector<FRoomLocation> GetNeighborsWithoutDoors(const FRoomLocation& roomLocation) const;
 
-	std::vector<DirectionUtils::Direction> GetDirectionsWithoutDoors(const RoomLocation& roomLocation) const;
+	std::vector<DirectionUtils::Direction> GetDirectionsWithoutDoors(const FRoomLocation& roomLocation) const;
 
-	std::vector<RoomLocation> GetRoomsAround(const RoomLocation& roomLocation) const;
+	std::vector<FRoomLocation> GetRoomsAround(const FRoomLocation& roomLocation) const;
 
 	int GetRows() const;
 	int GetCols() const;
 
 	//Methods to manipulate underlying data
-	void AddDoorsBetween(const RoomLocation& room1, const RoomLocation& room2);
-	void RemoveDoorsBetween(const RoomLocation& room1, const RoomLocation& room2);
-	void SetEntrance(const RoomLocation room);
-	void SetBossRoom(const RoomLocation room);
+	void AddDoorsBetween(const FRoomLocation& room1, const FRoomLocation& room2);
+	void RemoveDoorsBetween(const FRoomLocation& room1, const FRoomLocation& room2);
+	void SetEntrance(const FRoomLocation room);
+	void SetBossRoom(const FRoomLocation room);
 
 private:
-	const int32 ROWS;
-	const int32 COLS;
-	const uint32 RND_SEED;
-	RoomLocation entrance;
-	RoomLocation bossRoom;
+	int32 ROWS = 5;
+	int32 COLS = 5;
+	uint32 RND_SEED = 1;
+	FRoomLocation entrance;
+	FRoomLocation bossRoom;
 
-	std::map<RoomLocation, std::shared_ptr<RoomData>> levelRooms;
+	std::map<FRoomLocation, URoomData*> levelRooms;
 
-	DirectionUtils::Direction GetDirectionBetweenRooms(const RoomLocation& room1, const RoomLocation& room2) const;
+	DirectionUtils::Direction GetDirectionBetweenRooms(const FRoomLocation& room1, const FRoomLocation& room2) const;
 };

@@ -7,30 +7,33 @@
 #include "DirectionUtils.h"
 
 #include <memory>
+#include "LevelLayout.generated.h"
 
-class LevelData;
-struct RoomLocation;
+
+class ULevelData;
+struct FRoomLocation;
 
 /**
  * Class that builds out the LevelData
  */
-class DYSPHORIA_API LevelLayout
+UCLASS()
+class DYSPHORIA_API ULevelLayout : public UObject
 {
-public:
-	LevelLayout();
-	~LevelLayout();
+	GENERATED_BODY()
 
+public:
 	void Setup(const int32 rowRooms, const int32 colRooms);
 
 	//Ensure Setup is called before Build
 	void Build();
 
-	//Ensure Build was called
-	std::shared_ptr<LevelData> GetLevelData();
+	//Ensure Build was called before this method
+	ULevelData* GetLevelData();
 
 private:
-	const float PERCENTAGE_OF_EXTRA_DOORS = 0.33f;
-	std::shared_ptr<LevelData> levelData = nullptr;
+	float PERCENTAGE_OF_EXTRA_DOORS = 0.33f;
+
+	ULevelData* levelData = nullptr;
 
 	//Map building methods
 	void ConnectAllRooms();
@@ -38,7 +41,7 @@ private:
 	void PlaceBossRoom();
 	void AddExtraDoors();
 
-	RoomLocation GetRandomLocation() const;
-	RoomLocation GetNeighborToAttachTo(const RoomLocation& roomLocation) const;
-	RoomLocation GetRoomLocationInDirection(const RoomLocation& randomLocation, const DirectionUtils::Direction direction) const;
+	FRoomLocation GetRandomLocation() const;
+	FRoomLocation GetNeighborToAttachTo(const FRoomLocation& roomLocation) const;
+	FRoomLocation GetRoomLocationInDirection(const FRoomLocation& randomLocation, const DirectionUtils::Direction direction) const;
 };

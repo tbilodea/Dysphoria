@@ -6,14 +6,17 @@
 #include "DirectionUtils.h"
 #include <set>
 
+#include "RoomData.generated.h"
+
 /**
  * Data structure for each room in the game
  */
-class DYSPHORIA_API RoomData
+UCLASS()
+class DYSPHORIA_API URoomData : public UObject
 {
+	GENERATED_BODY()
+
 public:
-	RoomData();
-	~RoomData();
 
 	// Information about this room
 	bool ConnectedToAnotherRoom() const;

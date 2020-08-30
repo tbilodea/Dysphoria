@@ -4,15 +4,19 @@
 
 #include "CoreMinimal.h"
 
+#include "LevelGenerator.generated.h"
+
 /**
  * 
  */
-class DYSPHORIA_API LevelGenerator
+UCLASS()
+class DYSPHORIA_API ULevelGenerator : public UObject
 {
+	GENERATED_BODY()
+
 public:
-	LevelGenerator();
-	~LevelGenerator();
 
 	//Generates the level specified
+	UFUNCTION(BlueprintCallable)
 	void GenerateLevel(const int32 level);
 };

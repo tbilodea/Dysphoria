@@ -5,47 +5,37 @@
 
 #include "RoomData.h"
 
-LevelData::LevelData() : ROWS(5), COLS(5), RND_SEED(-1)
-{
-	InitializeLevelDataMap();
-}
-
-LevelData::LevelData(int32 rows, int32 cols, uint32 seed) : ROWS(rows), COLS(cols), RND_SEED(seed)
-{
-	InitializeLevelDataMap();
-}
-
-LevelData::~LevelData()
-{
-}
-
 //Initialize the map with the appropriate rows/cols of empty RoomDatas
-void LevelData::InitializeLevelDataMap()
+void ULevelData::InitializeLevelDataMap(int32 rows, int32 cols, uint32 seed)
 {
+	ROWS = rows;
+	COLS = cols;
+	RND_SEED = seed;
+
 	for (int row = 0; row < ROWS; row++) {
 		for (int col = 0; col < COLS; col++) {
-			RoomLocation roomLocation;
+			FRoomLocation roomLocation;
 			
 			roomLocation.row = row;
 			roomLocation.col = col;
 
-			auto roomDataPointer = std::make_shared<RoomData>(RoomData());
+			auto roomDataPointer = NewObject<URoomData>();
 
 			levelRooms.insert(std::make_pair(roomLocation, roomDataPointer));
 		}
 	}
 }
 
-//Returns copy of levelRooms map
-std::map<RoomLocation, std::shared_ptr<RoomData>> LevelData::GetAllRoomDatas()
+//Returns levelRooms map
+std::map<FRoomLocation, URoomData*> ULevelData::GetAllRoomDatas()
 {
-	return std::map<RoomLocation, std::shared_ptr<RoomData>>(levelRooms);
+	return levelRooms;
 }
 
 //Get the appropriate RoomData for the row col. Defaults to the first room if row/col is out of range.
-std::shared_ptr<RoomData> LevelData::GetRoomData(const int row, const int col)
+URoomData* ULevelData::GetRoomData(const int row, const int col)
 {
-	RoomLocation location;
+	FRoomLocation location;
 	location.row = row;
 	location.col = col;
 
@@ -64,13 +54,13 @@ std::shared_ptr<RoomData> LevelData::GetRoomData(const int row, const int col)
 	}
 }
 
-std::vector<RoomLocation> LevelData::GetNeighborsOf(const RoomLocation & roomLocation) const
+std::vector<FRoomLocation> ULevelData::GetNeighborsOf(const FRoomLocation & roomLocation) const
 {
-	std::vector<RoomLocation> neighbors = {};
+	std::vector<FRoomLocation> neighbors = {};
 	
 	//Room to the left
 	if (roomLocation.col - 1 >= 0) {
-		RoomLocation neighbor;
+		FRoomLocation neighbor;
 		neighbor.row = roomLocation.row;
 		neighbor.col = roomLocation.col - 1;
 		neighbors.emplace_back(neighbor);
@@ -78,7 +68,7 @@ std::vector<RoomLocation> LevelData::GetNeighborsOf(const RoomLocation & roomLoc
 
 	//Room to the right
 	if (roomLocation.col + 1 < COLS) {
-		RoomLocation neighbor;
+		FRoomLocation neighbor;
 		neighbor.row = roomLocation.row;
 		neighbor.col = roomLocation.col + 1;
 		neighbors.emplace_back(neighbor);
@@ -86,7 +76,7 @@ std::vector<RoomLocation> LevelData::GetNeighborsOf(const RoomLocation & roomLoc
 
 	//Room above
 	if (roomLocation.row + 1 < ROWS) {
-		RoomLocation neighbor;
+		FRoomLocation neighbor;
 		neighbor.row = roomLocation.row + 1;
 		neighbor.col = roomLocation.col;
 		neighbors.emplace_back(neighbor);
@@ -94,7 +84,7 @@ std::vector<RoomLocation> LevelData::GetNeighborsOf(const RoomLocation & roomLoc
 
 	//Room below
 	if (roomLocation.row - 1 >= 0) {
-		RoomLocation neighbor;
+		FRoomLocation neighbor;
 		neighbor.row = roomLocation.row - 1;
 		neighbor.col = roomLocation.col;
 		neighbors.emplace_back(neighbor);
@@ -103,10 +93,10 @@ std::vector<RoomLocation> LevelData::GetNeighborsOf(const RoomLocation & roomLoc
 	return neighbors;
 }
 
-std::vector<RoomLocation> LevelData::GetNeighborsWithDoors(const RoomLocation & roomLocation) const
+std::vector<FRoomLocation> ULevelData::GetNeighborsWithDoors(const FRoomLocation & roomLocation) const
 {
-	std::vector<RoomLocation> neighbors = GetNeighborsOf(roomLocation);
-	std::vector<RoomLocation> neighborsWithDoors = {};
+	std::vector<FRoomLocation> neighbors = GetNeighborsOf(roomLocation);
+	std::vector<FRoomLocation> neighborsWithDoors = {};
 
 	//Filter out rooms without doors
 	for(auto neighborLocation : neighbors) {
@@ -124,10 +114,10 @@ std::vector<RoomLocation> LevelData::GetNeighborsWithDoors(const RoomLocation & 
 	return neighborsWithDoors;
 }
 
-std::vector<RoomLocation> LevelData::GetNeighborsWithoutDoors(const RoomLocation & roomLocation) const
+std::vector<FRoomLocation> ULevelData::GetNeighborsWithoutDoors(const FRoomLocation & roomLocation) const
 {
-	std::vector<RoomLocation> neighbors = GetNeighborsOf(roomLocation);
-	std::vector<RoomLocation> neighborsWithoutDoors = {};
+	std::vector<FRoomLocation> neighbors = GetNeighborsOf(roomLocation);
+	std::vector<FRoomLocation> neighborsWithoutDoors = {};
 
 	//Filter out rooms with doors
 	for (auto neighborLocation : neighbors) {
@@ -141,7 +131,7 @@ std::vector<RoomLocation> LevelData::GetNeighborsWithoutDoors(const RoomLocation
 	return neighborsWithoutDoors;
 }
 
-std::vector<DirectionUtils::Direction> LevelData::GetDirectionsWithoutDoors(const RoomLocation & roomLocation) const
+std::vector<DirectionUtils::Direction> ULevelData::GetDirectionsWithoutDoors(const FRoomLocation & roomLocation) const
 {
 	std::vector<DirectionUtils::Direction> withoutDoors = {};
 	auto it = levelRooms.find(roomLocation);
@@ -159,13 +149,13 @@ std::vector<DirectionUtils::Direction> LevelData::GetDirectionsWithoutDoors(cons
 	return withoutDoors;
 }
 
-std::vector<RoomLocation> LevelData::GetRoomsAround(const RoomLocation & roomLocation) const
+std::vector<FRoomLocation> ULevelData::GetRoomsAround(const FRoomLocation & roomLocation) const
 {
-	std::vector<RoomLocation> roomsAround = GetNeighborsOf(roomLocation);
+	std::vector<FRoomLocation> roomsAround = GetNeighborsOf(roomLocation);
 
 	//Room in the NE corner
 	if (roomLocation.row + 1 < ROWS && roomLocation.col + 1 < COLS) {
-		RoomLocation neighbor;
+		FRoomLocation neighbor;
 		neighbor.row = roomLocation.row + 1;
 		neighbor.col = roomLocation.col + 1;
 		roomsAround.emplace_back(neighbor);
@@ -173,7 +163,7 @@ std::vector<RoomLocation> LevelData::GetRoomsAround(const RoomLocation & roomLoc
 	
 	//Room in the NW corner
 	if (roomLocation.row + 1 < ROWS && roomLocation.col - 1 >= 0) {
-		RoomLocation neighbor;
+		FRoomLocation neighbor;
 		neighbor.row = roomLocation.row + 1;
 		neighbor.col = roomLocation.col - 1;
 		roomsAround.emplace_back(neighbor);
@@ -181,7 +171,7 @@ std::vector<RoomLocation> LevelData::GetRoomsAround(const RoomLocation & roomLoc
 
 	//Room in the SE corner
 	if (roomLocation.row - 1 >= 0 && roomLocation.col + 1 < COLS) {
-		RoomLocation neighbor;
+		FRoomLocation neighbor;
 		neighbor.row = roomLocation.row - 1;
 		neighbor.col = roomLocation.col + 1;
 		roomsAround.emplace_back(neighbor);
@@ -189,7 +179,7 @@ std::vector<RoomLocation> LevelData::GetRoomsAround(const RoomLocation & roomLoc
 
 	//Room in the SW corner
 	if (roomLocation.row - 1 >= 0 && roomLocation.col - 1 >= 0) {
-		RoomLocation neighbor;
+		FRoomLocation neighbor;
 		neighbor.row = roomLocation.row - 1;
 		neighbor.col = roomLocation.col - 1;
 		roomsAround.emplace_back(neighbor);
@@ -198,22 +188,22 @@ std::vector<RoomLocation> LevelData::GetRoomsAround(const RoomLocation & roomLoc
 	return roomsAround;
 }
 
-int LevelData::GetRows() const
+int ULevelData::GetRows() const
 {
 	return ROWS;
 }
 
-int LevelData::GetCols() const
+int ULevelData::GetCols() const
 {
 	return COLS;
 }
 
 //Adds the walls to the rooms, TODO there's no error handling here for if they are not next to each other
-void LevelData::AddDoorsBetween(const RoomLocation & room1, const RoomLocation & room2)
+void ULevelData::AddDoorsBetween(const FRoomLocation & room1, const FRoomLocation & room2)
 {
 	DirectionUtils::Direction direction = GetDirectionBetweenRooms(room1, room2);
 
-	std::shared_ptr<RoomData> roomData1;
+	URoomData* roomData1;
 
 	auto it1 = levelRooms.find(room1);
 	if (it1 != levelRooms.end()) {
@@ -224,7 +214,7 @@ void LevelData::AddDoorsBetween(const RoomLocation & room1, const RoomLocation &
 		return;
 	}
 
-	std::shared_ptr<RoomData> roomData2;
+	URoomData* roomData2;
 
 	auto it2 = levelRooms.find(room2);
 	if (it2 != levelRooms.end()) {
@@ -239,11 +229,11 @@ void LevelData::AddDoorsBetween(const RoomLocation & room1, const RoomLocation &
 	roomData2->AddDoor(DirectionUtils::GetOppositeDirection(direction));
 }
 
-void LevelData::RemoveDoorsBetween(const RoomLocation & room1, const RoomLocation & room2)
+void ULevelData::RemoveDoorsBetween(const FRoomLocation & room1, const FRoomLocation & room2)
 {
 	DirectionUtils::Direction direction = GetDirectionBetweenRooms(room1, room2);
 
-	std::shared_ptr<RoomData> roomData1;
+	URoomData* roomData1;
 
 	auto it1 = levelRooms.find(room1);
 	if (it1 != levelRooms.end()) {
@@ -254,7 +244,7 @@ void LevelData::RemoveDoorsBetween(const RoomLocation & room1, const RoomLocatio
 		return;
 	}
 
-	std::shared_ptr<RoomData> roomData2;
+	URoomData* roomData2;
 
 	auto it2 = levelRooms.find(room2);
 	if (it2 != levelRooms.end()) {
@@ -269,18 +259,18 @@ void LevelData::RemoveDoorsBetween(const RoomLocation & room1, const RoomLocatio
 	roomData2->RemoveDoor(DirectionUtils::GetOppositeDirection(direction));
 }
 
-void LevelData::SetEntrance(const RoomLocation room)
+void ULevelData::SetEntrance(const FRoomLocation room)
 {
 	entrance = room;
 }
 
-void LevelData::SetBossRoom(const RoomLocation room)
+void ULevelData::SetBossRoom(const FRoomLocation room)
 {
 	bossRoom = room;
 }
 
 //Returns the direction from room1 to room2
-DirectionUtils::Direction LevelData::GetDirectionBetweenRooms(const RoomLocation& room1, const RoomLocation& room2) const 
+DirectionUtils::Direction ULevelData::GetDirectionBetweenRooms(const FRoomLocation& room1, const FRoomLocation& room2) const 
 {
 	int32 rowDelta = room1.row - room2.row;
 	int32 colDelta = room1.col - room2.col;

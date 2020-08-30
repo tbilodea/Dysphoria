@@ -9,23 +9,15 @@
 #include <time.h>
 #include <cmath>
 
-LevelLayout::LevelLayout()
-{
-}
-
-LevelLayout::~LevelLayout()
-{
-}
-
-void LevelLayout::Setup(const int32 rowRooms, const int32 colRooms)
+void ULevelLayout::Setup(const int32 rowRooms, const int32 colRooms)
 {
 	uint32 rndSeed = time(NULL);
 	srand(rndSeed);
-	levelData = std::make_shared<LevelData>(LevelData(rowRooms, colRooms, rndSeed));
-	levelData->InitializeLevelDataMap();
+	levelData = NewObject<ULevelData>();
+	levelData->InitializeLevelDataMap(rowRooms, colRooms, rndSeed);
 }
 
-void LevelLayout::Build()
+void ULevelLayout::Build()
 {
 	if (!levelData) { return; }
 
@@ -40,23 +32,23 @@ void LevelLayout::Build()
 	PlaceBossRoom();
 }
 
-std::shared_ptr<LevelData> LevelLayout::GetLevelData()
+ULevelData* ULevelLayout::GetLevelData()
 {
 	if (!levelData)
 	{
-		levelData = std::make_shared<LevelData>(LevelData());
-		levelData->InitializeLevelDataMap();
-		UE_LOG(LogTemp, Warning, TEXT("While getting level data in LevelLayout, the map was not initialized. Returning an empty map."));
+		levelData = NewObject<ULevelData>();
+		levelData->InitializeLevelDataMap(5, 5, 1);
+		UE_LOG(LogTemp, Warning, TEXT("While getting level data in ULevelLayout, the map was not initialized. Returning an empty map."));
 	}
 
 	return levelData;
 }
 
 // Using a greedy (PRIM) algorithm, connect all the rooms
-void LevelLayout::ConnectAllRooms() 
+void ULevelLayout::ConnectAllRooms() 
 {
-	RoomLocation startLocation = GetRandomLocation();
-	std::vector<RoomLocation> frontier = {};
+	FRoomLocation startLocation = GetRandomLocation();
+	std::vector<FRoomLocation> frontier = {};
 
 	for (auto neighbor : levelData->GetNeighborsWithoutDoors(startLocation)) {
 		frontier.emplace_back(neighbor);
@@ -65,17 +57,17 @@ void LevelLayout::ConnectAllRooms()
 	//Looping through the frontier while there is one
 	while (frontier.size() != 0) {
 		// grab a random frontier room
-		RoomLocation selectedFrontierRoom = frontier.at(rand() % frontier.size()); 
+		FRoomLocation selectedFrontierRoom = frontier.at(rand() % frontier.size()); 
 
 		// random bridge to a room already in the map
-		RoomLocation inMapNeighbor = GetNeighborToAttachTo(selectedFrontierRoom);
+		FRoomLocation inMapNeighbor = GetNeighborToAttachTo(selectedFrontierRoom);
 
 		// add the door to the rooms
 		levelData->AddDoorsBetween(inMapNeighbor, selectedFrontierRoom);
 
 		// remove it from the frontier
 		frontier.erase(
-			std::remove_if(frontier.begin(), frontier.end(), [&](RoomLocation const & loc) {
+			std::remove_if(frontier.begin(), frontier.end(), [&](FRoomLocation const & loc) {
 				return loc.row == selectedFrontierRoom.row && loc.col == selectedFrontierRoom.col;
 			}),
 			frontier.end());
@@ -90,9 +82,9 @@ void LevelLayout::ConnectAllRooms()
 }
 
 //Chosing a first row cell to be the start room
-void LevelLayout::PlaceEntranceRoom() 
+void ULevelLayout::PlaceEntranceRoom() 
 {
-	RoomLocation entrance;
+	FRoomLocation entrance;
 	entrance.row = 0;
 	entrance.col = rand() % levelData->GetCols();
 
@@ -100,9 +92,9 @@ void LevelLayout::PlaceEntranceRoom()
 }
 
 //Choosing a last row cell to be the end room, connect every room around it, and then connect it just once randomly to one of those rooms
-void LevelLayout::PlaceBossRoom()
+void ULevelLayout::PlaceBossRoom()
 {
-	RoomLocation bossRoom;
+	FRoomLocation bossRoom;
 	bossRoom.row = levelData->GetRows() - 1;
 	bossRoom.col = rand() % levelData->GetCols();
 
@@ -125,7 +117,7 @@ void LevelLayout::PlaceBossRoom()
 	levelData->SetBossRoom(bossRoom);
 }
 
-void LevelLayout::AddExtraDoors()
+void ULevelLayout::AddExtraDoors()
 {
 	// TODO Should probably make this logic more sophisticated since it doesn't scale to the
 	//amount of cells neighboring, but it'll do for now
@@ -135,7 +127,7 @@ void LevelLayout::AddExtraDoors()
 
 	for (int32 i = 0; i < numberOfDoorsToAdd; i++) {
 		//Grab a random cell
-		RoomLocation randomLocation = GetRandomLocation();
+		FRoomLocation randomLocation = GetRandomLocation();
 
 		//Pick a random Direction not given a door
 		std::vector<DirectionUtils::Direction> directions = levelData->GetDirectionsWithoutDoors(randomLocation);
@@ -146,7 +138,7 @@ void LevelLayout::AddExtraDoors()
 		}
 
 		DirectionUtils::Direction randomDirection = directions.at(rand() % directions.size());
-		RoomLocation neighborLocation = GetRoomLocationInDirection(randomLocation, randomDirection);
+		FRoomLocation neighborLocation = GetRoomLocationInDirection(randomLocation, randomDirection);
 
 		//Give it a door
 
@@ -154,7 +146,7 @@ void LevelLayout::AddExtraDoors()
 	}
 }
 
-RoomLocation LevelLayout::GetRandomLocation() const
+FRoomLocation ULevelLayout::GetRandomLocation() const
 {
 	// Grab random room location in the level
 	int rows = levelData->GetRows();
@@ -163,7 +155,7 @@ RoomLocation LevelLayout::GetRandomLocation() const
 	int rowToStart = rand() % rows;
 	int colToStart = rand() % cols;
 
-	RoomLocation roomLocation;
+	FRoomLocation roomLocation;
 	roomLocation.row = rowToStart;
 	roomLocation.col = colToStart;
 
@@ -171,18 +163,18 @@ RoomLocation LevelLayout::GetRandomLocation() const
 }
 
 //Returns a RoomLocation of one next to roomLocation that has a door already (there may be multiple and it chooses randomly)
-RoomLocation LevelLayout::GetNeighborToAttachTo(const RoomLocation& roomLocation) const
+FRoomLocation ULevelLayout::GetNeighborToAttachTo(const FRoomLocation& roomLocation) const
 {
-	std::vector<RoomLocation> possibleAttachPoints = levelData->GetNeighborsWithDoors(roomLocation);
+	std::vector<FRoomLocation> possibleAttachPoints = levelData->GetNeighborsWithDoors(roomLocation);
 
 	int indexToSelect = rand() % possibleAttachPoints.size();
 
 	return possibleAttachPoints.at(indexToSelect);
 }
 
-RoomLocation LevelLayout::GetRoomLocationInDirection(const RoomLocation & randomLocation, const DirectionUtils::Direction direction) const
+FRoomLocation ULevelLayout::GetRoomLocationInDirection(const FRoomLocation & randomLocation, const DirectionUtils::Direction direction) const
 {
-	RoomLocation neighbor;
+	FRoomLocation neighbor;
 	neighbor.row = randomLocation.row;
 	neighbor.col = randomLocation.col;
 
