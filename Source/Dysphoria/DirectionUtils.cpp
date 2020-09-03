@@ -3,7 +3,7 @@
 
 #include "DirectionUtils.h"
 
-DirectionUtils::Direction DirectionUtils::GetOppositeDirection(const DirectionUtils::Direction direction)
+Direction DirectionUtils::GetOppositeDirection(const Direction direction)
 {
 	switch (direction) {
 		case Direction::NORTH:
@@ -19,7 +19,7 @@ DirectionUtils::Direction DirectionUtils::GetOppositeDirection(const DirectionUt
 	return Direction::NORTH;
 }
 
-DirectionUtils::Direction DirectionUtils::GetNextClockwiseDirection(const DirectionUtils::Direction direction)
+Direction DirectionUtils::GetNextClockwiseDirection(const Direction direction)
 {
 	switch (direction) {
 	case Direction::NORTH:
@@ -35,7 +35,7 @@ DirectionUtils::Direction DirectionUtils::GetNextClockwiseDirection(const Direct
 	return Direction::NORTH;
 }
 
-std::vector<DirectionUtils::Direction> DirectionUtils::GetAllDirections()
+TArray<Direction> DirectionUtils::GetAllDirections()
 {
 	return { Direction::NORTH, Direction::SOUTH, Direction::EAST, Direction::WEST };
 }

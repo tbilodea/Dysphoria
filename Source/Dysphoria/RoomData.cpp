@@ -3,24 +3,29 @@
 
 #include "RoomData.h"
 
+TSet<Direction> URoomData::GetDoors() const
+{
+	return hasDoor;
+}
+
 bool URoomData::ConnectedToAnotherRoom() const
 {
-	return hasDoor.size() != 0;
+	return hasDoor.Num() != 0;
 }
 
-bool URoomData::ConnectedToRoom(const DirectionUtils::Direction direction) const
+bool URoomData::ConnectedToRoom(const Direction direction) const
 {
-	auto it = hasDoor.find(direction);
-	return it != hasDoor.end();
+	auto it = hasDoor.Find(direction);
+	return it != NULL;
 }
 
-void URoomData::AddDoor(const DirectionUtils::Direction direction)
+void URoomData::AddDoor(const Direction direction)
 {
-	hasDoor.insert(direction);
+	hasDoor.Add(direction);
 }
 
-void URoomData::RemoveDoor(const DirectionUtils::Direction direction)
+void URoomData::RemoveDoor(const Direction direction)
 {
-	hasDoor.erase(direction);
+	hasDoor.Remove(direction);
 }
 

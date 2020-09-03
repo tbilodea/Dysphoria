@@ -4,7 +4,7 @@
 
 #include "LevelData.h"
 #include "RoomData.h"
-#include <vector>
+
 #include <random>
 #include <time.h>
 #include <cmath>
@@ -48,16 +48,16 @@ ULevelData* ULevelLayout::GetLevelData()
 void ULevelLayout::ConnectAllRooms() 
 {
 	FRoomLocation startLocation = GetRandomLocation();
-	std::vector<FRoomLocation> frontier = {};
+	TArray<FRoomLocation> Frontier;
 
 	for (auto neighbor : levelData->GetNeighborsWithoutDoors(startLocation)) {
-		frontier.emplace_back(neighbor);
+		Frontier.Add(neighbor);
 	}
 
 	//Looping through the frontier while there is one
-	while (frontier.size() != 0) {
+	while (Frontier.Num() != 0) {
 		// grab a random frontier room
-		FRoomLocation selectedFrontierRoom = frontier.at(rand() % frontier.size()); 
+		FRoomLocation selectedFrontierRoom = Frontier[rand() % Frontier.Num()]; 
 
 		// random bridge to a room already in the map
 		FRoomLocation inMapNeighbor = GetNeighborToAttachTo(selectedFrontierRoom);
@@ -66,16 +66,12 @@ void ULevelLayout::ConnectAllRooms()
 		levelData->AddDoorsBetween(inMapNeighbor, selectedFrontierRoom);
 
 		// remove it from the frontier
-		frontier.erase(
-			std::remove_if(frontier.begin(), frontier.end(), [&](FRoomLocation const & loc) {
-				return loc.row == selectedFrontierRoom.row && loc.col == selectedFrontierRoom.col;
-			}),
-			frontier.end());
+		Frontier.Remove(selectedFrontierRoom);
 
 		// add any neighbor rooms without doors to the frontier (not already assigned)
 		for (auto location : levelData->GetNeighborsWithoutDoors(selectedFrontierRoom))
 		{
-			frontier.emplace_back(location);
+			Frontier.Add(location);
 		}
 	}
 
@@ -111,7 +107,7 @@ void ULevelLayout::PlaceBossRoom()
 		levelData->RemoveDoorsBetween(bossRoom, roomAroundBoss);
 	}
 
-	auto& roomToConnect = roomsAroundBoss.at(rand() % roomsAroundBoss.size());
+	auto& roomToConnect = roomsAroundBoss[rand() % roomsAroundBoss.Num()];
 
 	levelData->AddDoorsBetween(bossRoom, roomToConnect);
 	levelData->SetBossRoom(bossRoom);
@@ -130,14 +126,14 @@ void ULevelLayout::AddExtraDoors()
 		FRoomLocation randomLocation = GetRandomLocation();
 
 		//Pick a random Direction not given a door
-		std::vector<DirectionUtils::Direction> directions = levelData->GetDirectionsWithoutDoors(randomLocation);
+		TArray<Direction> directions = levelData->GetDirectionsWithoutDoors(randomLocation);
 		
-		if (directions.size() == 0) {
+		if (directions.Num() == 0) {
 			//All doors are filled, so continue
 			continue;
 		}
 
-		DirectionUtils::Direction randomDirection = directions.at(rand() % directions.size());
+		Direction randomDirection = directions[rand() % directions.Num()];
 		FRoomLocation neighborLocation = GetRoomLocationInDirection(randomLocation, randomDirection);
 
 		//Give it a door
@@ -165,30 +161,30 @@ FRoomLocation ULevelLayout::GetRandomLocation() const
 //Returns a RoomLocation of one next to roomLocation that has a door already (there may be multiple and it chooses randomly)
 FRoomLocation ULevelLayout::GetNeighborToAttachTo(const FRoomLocation& roomLocation) const
 {
-	std::vector<FRoomLocation> possibleAttachPoints = levelData->GetNeighborsWithDoors(roomLocation);
+	TArray<FRoomLocation> possibleAttachPoints = levelData->GetNeighborsWithDoors(roomLocation);
 
-	int indexToSelect = rand() % possibleAttachPoints.size();
+	int indexToSelect = rand() % possibleAttachPoints.Num();
 
-	return possibleAttachPoints.at(indexToSelect);
+	return possibleAttachPoints[indexToSelect];
 }
 
-FRoomLocation ULevelLayout::GetRoomLocationInDirection(const FRoomLocation & randomLocation, const DirectionUtils::Direction direction) const
+FRoomLocation ULevelLayout::GetRoomLocationInDirection(const FRoomLocation & randomLocation, const Direction direction) const
 {
 	FRoomLocation neighbor;
 	neighbor.row = randomLocation.row;
 	neighbor.col = randomLocation.col;
 
 	switch (direction) {
-		case DirectionUtils::Direction::NORTH:
+		case Direction::NORTH:
 			neighbor.row++;
 			break;
-		case DirectionUtils::Direction::SOUTH:
+		case Direction::SOUTH:
 			neighbor.row--;
 			break;
-		case DirectionUtils::Direction::EAST:
+		case Direction::EAST:
 			neighbor.col++;
 			break;
-		case DirectionUtils::Direction::WEST:
+		case Direction::WEST:
 			neighbor.col--;
 			break;
 	}

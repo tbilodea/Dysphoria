@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-#include "DirectionUtils.h"
+#include "Directions.h"
 
 #include <memory>
 #include "LevelLayout.generated.h"
@@ -43,5 +43,5 @@ private:
 
 	FRoomLocation GetRandomLocation() const;
 	FRoomLocation GetNeighborToAttachTo(const FRoomLocation& roomLocation) const;
-	FRoomLocation GetRoomLocationInDirection(const FRoomLocation& randomLocation, const DirectionUtils::Direction direction) const;
+	FRoomLocation GetRoomLocationInDirection(const FRoomLocation& randomLocation, const Direction direction) const;
 };

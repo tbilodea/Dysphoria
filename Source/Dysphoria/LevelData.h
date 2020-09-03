@@ -4,13 +4,10 @@
 
 #include "CoreMinimal.h"
 
-#include "DirectionUtils.h"
-#include <memory>
-#include <map>
+#include "Directions.h"
+#include "RoomData.h"
 
 #include "LevelData.generated.h"
-
-class URoomData;
 
 /*
 * Struct for defining each rooms location, since this is data that doesn't need to be in the RoomData
@@ -25,33 +22,12 @@ struct FRoomLocation {
 	bool operator==(const FRoomLocation& rhs) const {
 		return row == rhs.row && col == rhs.col;
 	}
-
-	bool operator>(const FRoomLocation& rhs) const {
-		if (row != rhs.row) {
-			if (row > rhs.row) {
-				return true;
-			}
-			else if (row < rhs.row) {
-				return false;
-			}
-		}
-		//rows are equal, so use columns
-		return col > rhs.col;
-	}
-
-	bool operator<(const FRoomLocation& rhs) const {
-		if (row != rhs.row) {
-			if (row < rhs.row) {
-				return true;
-			}
-			else if (row > rhs.row) {
-				return false;
-			}
-		}
-		//rows are equal, so use columns
-		return col < rhs.col;
-	}
 };
+
+//For FRoomLocation use in maps as a key
+FORCEINLINE uint32 GetTypeHash(const FRoomLocation& loc) {
+	return FCrc::MemCrc32(&loc, sizeof(FRoomLocation));
+}
 
 /**
  * LevelData exists to store the data about a level
@@ -66,25 +42,25 @@ class DYSPHORIA_API ULevelData : public UObject
 public:
 
 	//Returns copy of levelRooms
-	std::map<FRoomLocation, URoomData*> GetAllRoomDatas();
+	TMap<FRoomLocation, URoomData*> GetAllRoomDatas();
 
 	//Returns a pointer to the RoomData at row/col
-	URoomData* GetRoomData(const int row, const int col);
+	URoomData* GetRoomData(const int32 row, const int32 col);
 
 	void InitializeLevelDataMap(int32 rows, int32 cols, uint32 seed);
 
-	std::vector<FRoomLocation> GetNeighborsOf(const FRoomLocation& roomLocation) const;
+	TArray<FRoomLocation> GetNeighborsOf(const FRoomLocation& roomLocation) const;
 
-	std::vector<FRoomLocation> GetNeighborsWithDoors(const FRoomLocation& roomLocation) const;
+	TArray<FRoomLocation> GetNeighborsWithDoors(const FRoomLocation& roomLocation) const;
 
-	std::vector<FRoomLocation> GetNeighborsWithoutDoors(const FRoomLocation& roomLocation) const;
+	TArray<FRoomLocation> GetNeighborsWithoutDoors(const FRoomLocation& roomLocation) const;
 
-	std::vector<DirectionUtils::Direction> GetDirectionsWithoutDoors(const FRoomLocation& roomLocation) const;
+	TArray<Direction> GetDirectionsWithoutDoors(const FRoomLocation& roomLocation) const;
 
-	std::vector<FRoomLocation> GetRoomsAround(const FRoomLocation& roomLocation) const;
+	TArray<FRoomLocation> GetRoomsAround(const FRoomLocation& roomLocation) const;
 
-	int GetRows() const;
-	int GetCols() const;
+	int32 GetRows() const;
+	int32 GetCols() const;
 
 	//Methods to manipulate underlying data
 	void AddDoorsBetween(const FRoomLocation& room1, const FRoomLocation& room2);
@@ -99,7 +75,7 @@ private:
 	FRoomLocation entrance;
 	FRoomLocation bossRoom;
 
-	std::map<FRoomLocation, URoomData*> levelRooms;
+	TMap<FRoomLocation, URoomData*> LevelRooms;
 
-	DirectionUtils::Direction GetDirectionBetweenRooms(const FRoomLocation& room1, const FRoomLocation& room2) const;
+	Direction GetDirectionBetweenRooms(const FRoomLocation& room1, const FRoomLocation& room2) const;
 };

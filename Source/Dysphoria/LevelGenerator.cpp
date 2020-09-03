@@ -3,6 +3,7 @@
 
 #include "LevelGenerator.h"
 #include "LevelLayout.h"
+#include "LevelData.h"
 
 void ULevelGenerator::GenerateLevel(const int32 level)
 {
@@ -10,9 +11,26 @@ void ULevelGenerator::GenerateLevel(const int32 level)
 	int32 rows = level + 4;
 	int32 cols = level + 4;
 
-	ULevelLayout layout;
+	ULevelLayout* layout = NewObject<ULevelLayout>();
 
-	layout.Setup(rows, cols);
+	layout->Setup(rows, cols);
 
-	layout.Build();
+	layout->Build();
+
+	levelData = layout->GetLevelData();
+}
+
+URoomData* ULevelGenerator::GetRoom(int32 row, int32 col) const
+{
+	return levelData->GetRoomData(row, col);
+}
+
+int32 ULevelGenerator::GetRows() const
+{
+	return levelData->GetRows();
+}
+
+int32 ULevelGenerator::GetCols() const
+{
+	return levelData->GetCols();
 }
