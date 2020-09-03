@@ -6,7 +6,6 @@
 
 #include "Directions.h"
 
-#include <memory>
 #include "LevelLayout.generated.h"
 
 
@@ -22,7 +21,7 @@ class DYSPHORIA_API ULevelLayout : public UObject
 	GENERATED_BODY()
 
 public:
-	void Setup(const int32 rowRooms, const int32 colRooms);
+	void Setup(const int32 RowRooms, const int32 ColRooms);
 
 	//Ensure Setup is called before Build
 	void Build();
@@ -33,7 +32,7 @@ public:
 private:
 	float PERCENTAGE_OF_EXTRA_DOORS = 0.33f;
 
-	ULevelData* levelData = nullptr;
+	ULevelData* LevelData = nullptr;
 
 	//Map building methods
 	void ConnectAllRooms();
@@ -42,6 +41,6 @@ private:
 	void AddExtraDoors();
 
 	FRoomLocation GetRandomLocation() const;
-	FRoomLocation GetNeighborToAttachTo(const FRoomLocation& roomLocation) const;
-	FRoomLocation GetRoomLocationInDirection(const FRoomLocation& randomLocation, const Direction direction) const;
+	FRoomLocation GetNeighborToAttachTo(const FRoomLocation& RoomLocation) const;
+	FRoomLocation GetRoomLocationInDirection(const FRoomLocation& RandomLocation, const Direction Direction) const;
 };

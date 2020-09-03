@@ -21,14 +21,14 @@ public:
 
 	// Information about this room
 	bool ConnectedToAnotherRoom() const;
-	bool ConnectedToRoom(const Direction direction) const;
+	bool ConnectedToRoom(const Direction Direction) const;
 
 	//Adds or removes a door to this room
-	void AddDoor(const Direction direction);
-	void RemoveDoor(const Direction direction);
+	void AddDoor(const Direction Direction);
+	void RemoveDoor(const Direction Direction);
 
 private:
 	//A set of Directions that have a door
-	TSet<Direction> hasDoor;
+	TSet<Direction> HasDoor;
 
 };

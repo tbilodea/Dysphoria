@@ -5,27 +5,27 @@
 
 TSet<Direction> URoomData::GetDoors() const
 {
-	return hasDoor;
+	return HasDoor;
 }
 
 bool URoomData::ConnectedToAnotherRoom() const
 {
-	return hasDoor.Num() != 0;
+	return HasDoor.Num() != 0;
 }
 
-bool URoomData::ConnectedToRoom(const Direction direction) const
+bool URoomData::ConnectedToRoom(const Direction Direction) const
 {
-	auto it = hasDoor.Find(direction);
-	return it != NULL;
+	auto It = HasDoor.Find(Direction);
+	return It != NULL;
 }
 
-void URoomData::AddDoor(const Direction direction)
+void URoomData::AddDoor(const Direction Direction)
 {
-	hasDoor.Add(direction);
+	HasDoor.Add(Direction);
 }
 
-void URoomData::RemoveDoor(const Direction direction)
+void URoomData::RemoveDoor(const Direction Direction)
 {
-	hasDoor.Remove(direction);
+	HasDoor.Remove(Direction);
 }
 

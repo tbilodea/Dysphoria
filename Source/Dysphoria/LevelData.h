@@ -16,11 +16,11 @@ USTRUCT()
 struct FRoomLocation {
 	GENERATED_BODY()
 
-	int32 row;
-	int32 col;
+	int32 Row;
+	int32 Col;
 
-	bool operator==(const FRoomLocation& rhs) const {
-		return row == rhs.row && col == rhs.col;
+	bool operator==(const FRoomLocation& Rhs) const {
+		return Row == Rhs.Row && Col == Rhs.Col;
 	}
 };
 
@@ -45,37 +45,37 @@ public:
 	TMap<FRoomLocation, URoomData*> GetAllRoomDatas();
 
 	//Returns a pointer to the RoomData at row/col
-	URoomData* GetRoomData(const int32 row, const int32 col);
+	URoomData* GetRoomData(const int32 Row, const int32 Col);
 
-	void InitializeLevelDataMap(int32 rows, int32 cols, uint32 seed);
+	void InitializeLevelDataMap(int32 Rows, int32 Cols, uint32 Seed);
 
-	TArray<FRoomLocation> GetNeighborsOf(const FRoomLocation& roomLocation) const;
+	TArray<FRoomLocation> GetNeighborsOf(const FRoomLocation& RoomLocation) const;
 
-	TArray<FRoomLocation> GetNeighborsWithDoors(const FRoomLocation& roomLocation) const;
+	TArray<FRoomLocation> GetNeighborsWithDoors(const FRoomLocation& RoomLocation) const;
 
-	TArray<FRoomLocation> GetNeighborsWithoutDoors(const FRoomLocation& roomLocation) const;
+	TArray<FRoomLocation> GetNeighborsWithoutDoors(const FRoomLocation& RoomLocation) const;
 
-	TArray<Direction> GetDirectionsWithoutDoors(const FRoomLocation& roomLocation) const;
+	TArray<Direction> GetDirectionsWithoutDoors(const FRoomLocation& RoomLocation) const;
 
-	TArray<FRoomLocation> GetRoomsAround(const FRoomLocation& roomLocation) const;
+	TArray<FRoomLocation> GetRoomsAround(const FRoomLocation& RoomLocation) const;
 
 	int32 GetRows() const;
 	int32 GetCols() const;
 
 	//Methods to manipulate underlying data
-	void AddDoorsBetween(const FRoomLocation& room1, const FRoomLocation& room2);
-	void RemoveDoorsBetween(const FRoomLocation& room1, const FRoomLocation& room2);
-	void SetEntrance(const FRoomLocation room);
-	void SetBossRoom(const FRoomLocation room);
+	void AddDoorsBetween(const FRoomLocation& Room1, const FRoomLocation& Room2);
+	void RemoveDoorsBetween(const FRoomLocation& Room1, const FRoomLocation& Room2);
+	void SetEntrance(const FRoomLocation Room);
+	void SetBossRoom(const FRoomLocation Room);
 
 private:
 	int32 ROWS = 5;
 	int32 COLS = 5;
 	uint32 RND_SEED = 1;
-	FRoomLocation entrance;
-	FRoomLocation bossRoom;
+	FRoomLocation Entrance;
+	FRoomLocation BossRoom;
 
 	TMap<FRoomLocation, URoomData*> LevelRooms;
 
-	Direction GetDirectionBetweenRooms(const FRoomLocation& room1, const FRoomLocation& room2) const;
+	Direction GetDirectionBetweenRooms(const FRoomLocation& Room1, const FRoomLocation& Room2) const;
 };

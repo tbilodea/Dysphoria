@@ -9,17 +9,17 @@
 #include <time.h>
 #include <cmath>
 
-void ULevelLayout::Setup(const int32 rowRooms, const int32 colRooms)
+void ULevelLayout::Setup(const int32 RowRooms, const int32 ColRooms)
 {
-	uint32 rndSeed = time(NULL);
-	srand(rndSeed);
-	levelData = NewObject<ULevelData>();
-	levelData->InitializeLevelDataMap(rowRooms, colRooms, rndSeed);
+	uint32 RndSeed = time(NULL);
+	srand(RndSeed);
+	LevelData = NewObject<ULevelData>();
+	LevelData->InitializeLevelDataMap(RowRooms, ColRooms, RndSeed);
 }
 
 void ULevelLayout::Build()
 {
-	if (!levelData) { return; }
+	if (!LevelData) { return; }
 
 	//Connects all the rooms with doors
 	ConnectAllRooms();
@@ -34,45 +34,42 @@ void ULevelLayout::Build()
 
 ULevelData* ULevelLayout::GetLevelData()
 {
-	if (!levelData)
+	if (!LevelData)
 	{
-		levelData = NewObject<ULevelData>();
-		levelData->InitializeLevelDataMap(5, 5, 1);
+		LevelData = NewObject<ULevelData>();
+		LevelData->InitializeLevelDataMap(5, 5, 1);
 		UE_LOG(LogTemp, Warning, TEXT("While getting level data in ULevelLayout, the map was not initialized. Returning an empty map."));
 	}
 
-	return levelData;
+	return LevelData;
 }
 
 // Using a greedy (PRIM) algorithm, connect all the rooms
 void ULevelLayout::ConnectAllRooms() 
 {
-	FRoomLocation startLocation = GetRandomLocation();
+	FRoomLocation StartLocation = GetRandomLocation();
 	TArray<FRoomLocation> Frontier;
 
-	for (auto neighbor : levelData->GetNeighborsWithoutDoors(startLocation)) {
-		Frontier.Add(neighbor);
+	for (auto Neighbor : LevelData->GetNeighborsWithoutDoors(StartLocation)) {
+		Frontier.Add(Neighbor);
 	}
 
 	//Looping through the frontier while there is one
 	while (Frontier.Num() != 0) {
 		// grab a random frontier room
-		FRoomLocation selectedFrontierRoom = Frontier[rand() % Frontier.Num()]; 
+		FRoomLocation SelectedFrontierRoom = Frontier[rand() % Frontier.Num()]; 
 
 		// random bridge to a room already in the map
-		FRoomLocation inMapNeighbor = GetNeighborToAttachTo(selectedFrontierRoom);
+		FRoomLocation InMapNeighbor = GetNeighborToAttachTo(SelectedFrontierRoom);
 
 		// add the door to the rooms
-		levelData->AddDoorsBetween(inMapNeighbor, selectedFrontierRoom);
+		LevelData->AddDoorsBetween(InMapNeighbor, SelectedFrontierRoom);
 
 		// remove it from the frontier
-		Frontier.Remove(selectedFrontierRoom);
+		Frontier.Remove(SelectedFrontierRoom);
 
 		// add any neighbor rooms without doors to the frontier (not already assigned)
-		for (auto location : levelData->GetNeighborsWithoutDoors(selectedFrontierRoom))
-		{
-			Frontier.Add(location);
-		}
+		Frontier.Append(LevelData->GetNeighborsWithoutDoors(SelectedFrontierRoom));
 	}
 
 }
@@ -80,114 +77,114 @@ void ULevelLayout::ConnectAllRooms()
 //Chosing a first row cell to be the start room
 void ULevelLayout::PlaceEntranceRoom() 
 {
-	FRoomLocation entrance;
-	entrance.row = 0;
-	entrance.col = rand() % levelData->GetCols();
+	FRoomLocation Entrance;
+	Entrance.Row = 0;
+	Entrance.Col = rand() % LevelData->GetCols();
 
-	levelData->SetEntrance(entrance);
+	LevelData->SetEntrance(Entrance);
 }
 
 //Choosing a last row cell to be the end room, connect every room around it, and then connect it just once randomly to one of those rooms
 void ULevelLayout::PlaceBossRoom()
 {
-	FRoomLocation bossRoom;
-	bossRoom.row = levelData->GetRows() - 1;
-	bossRoom.col = rand() % levelData->GetCols();
+	FRoomLocation BossRoom;
+	BossRoom.Row = LevelData->GetRows() - 1;
+	BossRoom.Col = rand() % LevelData->GetCols();
 
-	auto roomsAroundBoss = levelData->GetRoomsAround(bossRoom);
+	auto RoomsAroundBoss = LevelData->GetRoomsAround(BossRoom);
 
 	//Add connections between every room next to each other
-	for (auto& roomAroundBoss : roomsAroundBoss) {
-		for (auto& aSecondRoom : roomsAroundBoss) {
-			if (abs(roomAroundBoss.row - aSecondRoom.row) == 1 || abs(roomAroundBoss.col - aSecondRoom.col) == 1) {
-				levelData->AddDoorsBetween(roomAroundBoss, aSecondRoom);
+	for (auto& RoomAroundBoss : RoomsAroundBoss) {
+		for (auto& ASecondRoom : RoomsAroundBoss) {
+			if (abs(RoomAroundBoss.Row - ASecondRoom.Row) == 1 || abs(RoomAroundBoss.Col - ASecondRoom.Col) == 1) {
+				LevelData->AddDoorsBetween(RoomAroundBoss, ASecondRoom);
 			}
 		}
 		//Preemptively disconnect the rooms from the boss room
-		levelData->RemoveDoorsBetween(bossRoom, roomAroundBoss);
+		LevelData->RemoveDoorsBetween(BossRoom, RoomAroundBoss);
 	}
 
-	auto& roomToConnect = roomsAroundBoss[rand() % roomsAroundBoss.Num()];
+	auto& RoomToConnect = RoomsAroundBoss[rand() % RoomsAroundBoss.Num()];
 
-	levelData->AddDoorsBetween(bossRoom, roomToConnect);
-	levelData->SetBossRoom(bossRoom);
+	LevelData->AddDoorsBetween(BossRoom, RoomToConnect);
+	LevelData->SetBossRoom(BossRoom);
 }
 
 void ULevelLayout::AddExtraDoors()
 {
 	// TODO Should probably make this logic more sophisticated since it doesn't scale to the
 	//amount of cells neighboring, but it'll do for now
-	int32 numberOfRooms = levelData->GetRows() * levelData->GetCols();
+	int32 numberOfRooms = LevelData->GetRows() * LevelData->GetCols();
 
 	int32 numberOfDoorsToAdd = (int32) numberOfRooms * PERCENTAGE_OF_EXTRA_DOORS;
 
 	for (int32 i = 0; i < numberOfDoorsToAdd; i++) {
 		//Grab a random cell
-		FRoomLocation randomLocation = GetRandomLocation();
+		FRoomLocation RandomLocation = GetRandomLocation();
 
 		//Pick a random Direction not given a door
-		TArray<Direction> directions = levelData->GetDirectionsWithoutDoors(randomLocation);
+		TArray<Direction> Directions = LevelData->GetDirectionsWithoutDoors(RandomLocation);
 		
-		if (directions.Num() == 0) {
+		if (Directions.Num() == 0) {
 			//All doors are filled, so continue
 			continue;
 		}
 
-		Direction randomDirection = directions[rand() % directions.Num()];
-		FRoomLocation neighborLocation = GetRoomLocationInDirection(randomLocation, randomDirection);
+		Direction RandomDirection = Directions[rand() % Directions.Num()];
+		FRoomLocation NeighborLocation = GetRoomLocationInDirection(RandomLocation, RandomDirection);
 
 		//Give it a door
 
-		levelData->AddDoorsBetween(randomLocation, neighborLocation);
+		LevelData->AddDoorsBetween(RandomLocation, NeighborLocation);
 	}
 }
 
 FRoomLocation ULevelLayout::GetRandomLocation() const
 {
 	// Grab random room location in the level
-	int rows = levelData->GetRows();
-	int cols = levelData->GetCols();
+	int Rows = LevelData->GetRows();
+	int Cols = LevelData->GetCols();
 
-	int rowToStart = rand() % rows;
-	int colToStart = rand() % cols;
+	int RowToStart = rand() % Rows;
+	int ColToStart = rand() % Cols;
 
-	FRoomLocation roomLocation;
-	roomLocation.row = rowToStart;
-	roomLocation.col = colToStart;
+	FRoomLocation RoomLocation;
+	RoomLocation.Row = RowToStart;
+	RoomLocation.Col = ColToStart;
 
-	return roomLocation;
+	return RoomLocation;
 }
 
 //Returns a RoomLocation of one next to roomLocation that has a door already (there may be multiple and it chooses randomly)
-FRoomLocation ULevelLayout::GetNeighborToAttachTo(const FRoomLocation& roomLocation) const
+FRoomLocation ULevelLayout::GetNeighborToAttachTo(const FRoomLocation& RoomLocation) const
 {
-	TArray<FRoomLocation> possibleAttachPoints = levelData->GetNeighborsWithDoors(roomLocation);
+	TArray<FRoomLocation> PossibleAttachPoints = LevelData->GetNeighborsWithDoors(RoomLocation);
 
-	int indexToSelect = rand() % possibleAttachPoints.Num();
+	int IndexToSelect = rand() % PossibleAttachPoints.Num();
 
-	return possibleAttachPoints[indexToSelect];
+	return PossibleAttachPoints[IndexToSelect];
 }
 
-FRoomLocation ULevelLayout::GetRoomLocationInDirection(const FRoomLocation & randomLocation, const Direction direction) const
+FRoomLocation ULevelLayout::GetRoomLocationInDirection(const FRoomLocation & RandomLocation, const Direction Direction) const
 {
-	FRoomLocation neighbor;
-	neighbor.row = randomLocation.row;
-	neighbor.col = randomLocation.col;
+	FRoomLocation Neighbor;
+	Neighbor.Row = RandomLocation.Row;
+	Neighbor.Col = RandomLocation.Col;
 
-	switch (direction) {
+	switch (Direction) {
 		case Direction::NORTH:
-			neighbor.row++;
+			Neighbor.Row++;
 			break;
 		case Direction::SOUTH:
-			neighbor.row--;
+			Neighbor.Row--;
 			break;
 		case Direction::EAST:
-			neighbor.col++;
+			Neighbor.Col++;
 			break;
 		case Direction::WEST:
-			neighbor.col--;
+			Neighbor.Col--;
 			break;
 	}
 
-	return neighbor;
+	return Neighbor;
 }
