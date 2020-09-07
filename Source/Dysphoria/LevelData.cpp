@@ -6,7 +6,7 @@
 #include "DirectionUtils.h"
 
 //Initialize the map with the appropriate rows/cols of empty RoomDatas
-void ULevelData::InitializeLevelDataMap(int32 rows, int32 cols, uint32 seed)
+void ULevelData::InitializeLevelDataMap(int32 rows, int32 cols, int32 seed)
 {
 	ROWS = rows;
 	COLS = cols;
@@ -101,7 +101,7 @@ TArray<FRoomLocation> ULevelData::GetNeighborsWithDoors(const FRoomLocation & Ro
 	for(auto NeighborLocation : Neighbors) {
 		auto RoomToCheck = LevelRooms.Find(NeighborLocation);
 
-		if (RoomToCheck != nullptr){
+		if (RoomToCheck){
 			if (((*RoomToCheck)->ConnectedToAnotherRoom())) {
 				NeighborsWithDoors.Add(NeighborLocation);
 			}
@@ -137,13 +137,31 @@ TArray<Direction> ULevelData::GetDirectionsWithoutDoors(const FRoomLocation & Ro
 		return WithoutDoors;
 	}
 
-	for (auto Direction : DirectionUtils::GetAllDirections()) {
+	for (auto Direction : GetNeighborDirections(RoomLocation)) {
 		if (!((*RoomData)->ConnectedToRoom(Direction)) ) {
 			WithoutDoors.Add(Direction);
 		}
 	}
 
 	return WithoutDoors;
+}
+
+TArray<Direction> ULevelData::GetNeighborDirections(const FRoomLocation & RoomLocation) const
+{
+	TArray<Direction> NeighborDirections;
+	if (RoomLocation.Row > 0)
+		NeighborDirections.Add(Direction::SOUTH);
+
+	if (RoomLocation.Row < GetRows() - 1)
+		NeighborDirections.Add(Direction::NORTH);
+
+	if (RoomLocation.Col > 0)
+		NeighborDirections.Add(Direction::WEST);
+
+	if (RoomLocation.Col < GetCols() - 1)
+		NeighborDirections.Add(Direction::EAST);
+
+	return NeighborDirections;
 }
 
 TArray<FRoomLocation> ULevelData::GetRoomsAround(const FRoomLocation & RoomLocation) const
@@ -193,6 +211,16 @@ int32 ULevelData::GetRows() const
 int32 ULevelData::GetCols() const
 {
 	return COLS;
+}
+
+FRoomLocation ULevelData::GetBossRoom() const
+{
+	return BossRoom;
+}
+
+FRoomLocation ULevelData::GetEntrance() const
+{
+	return Entrance;
 }
 
 //Adds the walls to the rooms, TODO there's no error handling here for if they are not next to each other
@@ -270,4 +298,110 @@ Direction ULevelData::GetDirectionBetweenRooms(const FRoomLocation& Room1, const
 
 	UE_LOG(LogTemp, Warning, TEXT("Room 1 at [%i, %i] and 2 [%i, %i] aren't next to each other, returning a default of NORTH"), Room1.Row, Room1.Col, Room2.Row, Room2.Col);
 	return Direction::NORTH;
+}
+
+// TEST FUNCTIONS
+TArray<int32> ULevelData::TESTBP_GetNeighborsOf(int32 Row, int32 Col)
+{
+	TArray<int32> Neighbors;
+	FRoomLocation RoomLocation;
+	RoomLocation.Row = Row;
+	RoomLocation.Col = Col;
+
+	auto NeighborsRLs = GetNeighborsOf(RoomLocation);
+
+	for (auto& NeighborRL : NeighborsRLs) {
+		Neighbors.Add(NeighborRL.Row);
+		Neighbors.Add(NeighborRL.Col);
+	}
+	return Neighbors;
+}
+
+TArray<int32> ULevelData::TESTBP_GetNeighborsWithDoors(int32 Row, int32 Col)
+{
+	TArray<int32> Neighbors;
+	FRoomLocation RoomLocation;
+	RoomLocation.Row = Row;
+	RoomLocation.Col = Col;
+
+	auto NeighborsRLs = GetNeighborsWithDoors(RoomLocation);
+
+	for (auto& NeighborRL : NeighborsRLs) {
+		Neighbors.Add(NeighborRL.Row);
+		Neighbors.Add(NeighborRL.Col);
+	}
+	return Neighbors;
+}
+
+TArray<int32> ULevelData::TESTBP_GetNeighborsWithoutDoors(int32 Row, int32 Col)
+{
+	TArray<int32> Neighbors;
+	FRoomLocation RoomLocation;
+	RoomLocation.Row = Row;
+	RoomLocation.Col = Col;
+
+	auto NeighborsRLs = GetNeighborsWithoutDoors(RoomLocation);
+
+	for (auto& NeighborRL : NeighborsRLs) {
+		Neighbors.Add(NeighborRL.Row);
+		Neighbors.Add(NeighborRL.Col);
+	}
+	return Neighbors;
+}
+
+TArray<int32> ULevelData::TESTBP_GetDirectionsWithoutDoors(int32 Row, int32 Col)
+{
+	TArray<int32> DirectionsWithoutDoors;
+	FRoomLocation RoomLocation;
+	RoomLocation.Row = Row;
+	RoomLocation.Col = Col;
+
+	auto Directions = GetDirectionsWithoutDoors(RoomLocation);
+
+	for (auto& Direction : Directions) {
+		DirectionsWithoutDoors.Add((int32)Direction);
+	}
+	return DirectionsWithoutDoors;
+}
+
+TArray<int32> ULevelData::TESTBP_GetRoomsAround(int32 Row, int32 Col)
+{
+	TArray<int32> Neighbors;
+	FRoomLocation RoomLocation;
+	RoomLocation.Row = Row;
+	RoomLocation.Col = Col;
+
+	auto NeighborsRLs = GetRoomsAround(RoomLocation);
+
+	for (auto& NeighborRL : NeighborsRLs) {
+		Neighbors.Add(NeighborRL.Row);
+		Neighbors.Add(NeighborRL.Col);
+	}
+	return Neighbors;
+}
+
+void ULevelData::TESTBP_AddDoorsBetween(int32 Row, int32 Col, int32 Row2, int32 Col2)
+{
+	FRoomLocation RoomLocation;
+	RoomLocation.Row = Row;
+	RoomLocation.Col = Col;
+
+	FRoomLocation RoomLocation2;
+	RoomLocation2.Row = Row2;
+	RoomLocation2.Col = Col2;
+
+	AddDoorsBetween(RoomLocation, RoomLocation2);
+}
+
+void ULevelData::TESTBP_RemoveDoorsBetween(int32 Row, int32 Col, int32 Row2, int32 Col2)
+{
+	FRoomLocation RoomLocation;
+	RoomLocation.Row = Row;
+	RoomLocation.Col = Col;
+
+	FRoomLocation RoomLocation2;
+	RoomLocation2.Row = Row2;
+	RoomLocation2.Col = Col2;
+
+	RemoveDoorsBetween(RoomLocation, RoomLocation2);
 }

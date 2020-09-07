@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 
+#include "RowCol.h"
+#include "Math/Vector.h" 
 #include "LevelGenerator.generated.h"
 
 class ULevelData;
@@ -31,7 +33,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	int32 GetCols() const;
 
+	UFUNCTION(BlueprintCallable)
+	URowCol* GetBossRoom() const;
+	UFUNCTION(BlueprintCallable)
+	URowCol* GetEntrance() const;
 
 private:
-	ULevelData* levelData = nullptr;
+	ULevelData* LevelData = nullptr;
 };

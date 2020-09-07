@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 
 #include "Directions.h"
+#include "Math/RandomStream.h"
 
 #include "LevelLayout.generated.h"
 
@@ -15,7 +16,7 @@ struct FRoomLocation;
 /**
  * Class that builds out the LevelData
  */
-UCLASS()
+UCLASS(Blueprintable)
 class DYSPHORIA_API ULevelLayout : public UObject
 {
 	GENERATED_BODY()
@@ -29,8 +30,19 @@ public:
 	//Ensure Build was called before this method
 	ULevelData* GetLevelData();
 
+	//TEST METHODS
+	UFUNCTION(BlueprintCallable)
+	TArray<int32> TESTBP_GetNeighborToAttachTo(int32 Row, int32 Col) const;
+	UFUNCTION(BlueprintCallable)
+	TArray<int32> TESTBP_GetRoomLocationInDirection(int32 Row, int32 Col, Direction Direction) const;
+	UFUNCTION(BlueprintCallable)
+	TArray<int32> TESTBP_GetRandomDirection() const;
+	UFUNCTION(BlueprintCallable)
+	void TESTBP_SetLevelData(ULevelData* LevelData);
+
 private:
 	float PERCENTAGE_OF_EXTRA_DOORS = 0.33f;
+	FRandomStream RandomStream;
 
 	ULevelData* LevelData = nullptr;
 

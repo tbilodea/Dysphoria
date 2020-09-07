@@ -5,14 +5,12 @@
 #include "LevelData.h"
 #include "RoomData.h"
 
-#include <random>
-#include <time.h>
 #include <cmath>
 
 void ULevelLayout::Setup(const int32 RowRooms, const int32 ColRooms)
 {
-	uint32 RndSeed = time(NULL);
-	srand(RndSeed);
+	RandomStream.GenerateNewSeed();
+	int32 RndSeed = RandomStream.GetCurrentSeed();
 	LevelData = NewObject<ULevelData>();
 	LevelData->InitializeLevelDataMap(RowRooms, ColRooms, RndSeed);
 }
@@ -30,6 +28,8 @@ void ULevelLayout::Build()
 	//Places important rooms
 	PlaceEntranceRoom();
 	PlaceBossRoom();
+
+	UE_LOG(LogTemp, Log, TEXT("Finished Level Layout Build"));
 }
 
 ULevelData* ULevelLayout::GetLevelData()
@@ -54,13 +54,29 @@ void ULevelLayout::ConnectAllRooms()
 		Frontier.Add(Neighbor);
 	}
 
+	bool FirstPass = true;
 	//Looping through the frontier while there is one
-	while (Frontier.Num() != 0) {
+	while (Frontier.Num() > 0) {
 		// grab a random frontier room
-		FRoomLocation SelectedFrontierRoom = Frontier[rand() % Frontier.Num()]; 
+		FRoomLocation SelectedFrontierRoom = Frontier[RandomStream.RandRange(0, Frontier.Num()-1)]; 
 
-		// random bridge to a room already in the map
+		// Bridge randomly to a room already in the map (has doors)
 		FRoomLocation InMapNeighbor = GetNeighborToAttachTo(SelectedFrontierRoom);
+
+		//First time through, the Selected Room won't find anything with doors yet since nothing has doors,
+		// so we'll handle that pass by attaching it to the Starting Room
+		if (FirstPass)
+		{
+			FirstPass = false;
+			InMapNeighbor = StartLocation;
+		}
+
+
+		if (InMapNeighbor.Row == -1) {
+			UE_LOG(LogTemp, Warning, TEXT("Could not find a neighbor to attach for [%i, %i], removing it from the frontier list."), SelectedFrontierRoom.Row, SelectedFrontierRoom.Col);
+			Frontier.Remove(SelectedFrontierRoom);
+			continue;
+		}
 
 		// add the door to the rooms
 		LevelData->AddDoorsBetween(InMapNeighbor, SelectedFrontierRoom);
@@ -71,7 +87,7 @@ void ULevelLayout::ConnectAllRooms()
 		// add any neighbor rooms without doors to the frontier (not already assigned)
 		Frontier.Append(LevelData->GetNeighborsWithoutDoors(SelectedFrontierRoom));
 	}
-
+	UE_LOG(LogTemp, Log, TEXT("Finished Connecting Rooms"));
 }
 
 //Chosing a first row cell to be the start room
@@ -79,7 +95,7 @@ void ULevelLayout::PlaceEntranceRoom()
 {
 	FRoomLocation Entrance;
 	Entrance.Row = 0;
-	Entrance.Col = rand() % LevelData->GetCols();
+	Entrance.Col = RandomStream.RandRange(0, LevelData->GetCols() - 1);
 
 	LevelData->SetEntrance(Entrance);
 }
@@ -89,8 +105,10 @@ void ULevelLayout::PlaceBossRoom()
 {
 	FRoomLocation BossRoom;
 	BossRoom.Row = LevelData->GetRows() - 1;
-	BossRoom.Col = rand() % LevelData->GetCols();
+	BossRoom.Col = RandomStream.RandRange(0, LevelData->GetCols() - 1);
 
+	//FIXME Currently has an issue reattaching rooms, don't use until it's fixed
+	/*
 	auto RoomsAroundBoss = LevelData->GetRoomsAround(BossRoom);
 
 	//Add connections between every room next to each other
@@ -104,10 +122,12 @@ void ULevelLayout::PlaceBossRoom()
 		LevelData->RemoveDoorsBetween(BossRoom, RoomAroundBoss);
 	}
 
-	auto& RoomToConnect = RoomsAroundBoss[rand() % RoomsAroundBoss.Num()];
+	auto& RoomToConnect = RoomsAroundBoss[RandomStream.RandRange(0, RoomsAroundBoss.Num() - 1)];
 
-	LevelData->AddDoorsBetween(BossRoom, RoomToConnect);
+	LevelData->AddDoorsBetween(BossRoom, RoomToConnect); */
 	LevelData->SetBossRoom(BossRoom);
+
+	UE_LOG(LogTemp, Log, TEXT("Finished Setting Boss Room"));
 }
 
 void ULevelLayout::AddExtraDoors()
@@ -130,23 +150,25 @@ void ULevelLayout::AddExtraDoors()
 			continue;
 		}
 
-		Direction RandomDirection = Directions[rand() % Directions.Num()];
+		Direction RandomDirection = Directions[RandomStream.RandRange(0, Directions.Num() -1 )];
 		FRoomLocation NeighborLocation = GetRoomLocationInDirection(RandomLocation, RandomDirection);
 
 		//Give it a door
 
 		LevelData->AddDoorsBetween(RandomLocation, NeighborLocation);
 	}
+
+	UE_LOG(LogTemp, Log, TEXT("Finished Adding Extra Room Connections"));
 }
 
 FRoomLocation ULevelLayout::GetRandomLocation() const
 {
 	// Grab random room location in the level
-	int Rows = LevelData->GetRows();
-	int Cols = LevelData->GetCols();
+	int32 Rows = LevelData->GetRows();
+	int32 Cols = LevelData->GetCols();
 
-	int RowToStart = rand() % Rows;
-	int ColToStart = rand() % Cols;
+	int32 RowToStart = RandomStream.RandRange(0, Rows - 1);
+	int32 ColToStart = RandomStream.RandRange(0, Cols - 1);
 
 	FRoomLocation RoomLocation;
 	RoomLocation.Row = RowToStart;
@@ -160,7 +182,14 @@ FRoomLocation ULevelLayout::GetNeighborToAttachTo(const FRoomLocation& RoomLocat
 {
 	TArray<FRoomLocation> PossibleAttachPoints = LevelData->GetNeighborsWithDoors(RoomLocation);
 
-	int IndexToSelect = rand() % PossibleAttachPoints.Num();
+	if (PossibleAttachPoints.Num() == 0) {
+		FRoomLocation BadLocation;
+		BadLocation.Row = -1;
+		BadLocation.Col = -1;
+		return BadLocation;
+	}
+
+	int32 IndexToSelect = RandomStream.RandRange(0, PossibleAttachPoints.Num() - 1 );
 
 	return PossibleAttachPoints[IndexToSelect];
 }
@@ -187,4 +216,43 @@ FRoomLocation ULevelLayout::GetRoomLocationInDirection(const FRoomLocation & Ran
 	}
 
 	return Neighbor;
+}
+
+//TEST METHODS
+TArray<int32> ULevelLayout::TESTBP_GetNeighborToAttachTo(int32 Row, int32 Col) const
+{
+	TArray<int32> Location;
+	FRoomLocation Room;
+	Room.Row = Row;
+	Room.Col = Col;
+	FRoomLocation NeighborRoom = GetNeighborToAttachTo(Room);
+	Location.Add(NeighborRoom.Row);
+	Location.Add(NeighborRoom.Col);
+	return Location;
+}
+
+TArray<int32> ULevelLayout::TESTBP_GetRoomLocationInDirection(int32 Row, int32 Col, Direction Direction) const
+{
+	TArray<int32> Location;
+	FRoomLocation Room;
+	Room.Row = Row;
+	Room.Col = Col;
+	FRoomLocation NeighborRoom = GetRoomLocationInDirection(Room, Direction);
+	Location.Add(NeighborRoom.Row);
+	Location.Add(NeighborRoom.Col);
+	return Location;
+}
+
+TArray<int32> ULevelLayout::TESTBP_GetRandomDirection() const 
+{
+	TArray<int32> RandomChoice;
+	FRoomLocation RoomLocation = GetRandomLocation();
+	RandomChoice.Add(RoomLocation.Row);
+	RandomChoice.Add(RoomLocation.Col);
+	return RandomChoice;
+}
+
+void ULevelLayout::TESTBP_SetLevelData(ULevelData* ALevelData) 
+{
+	LevelData = ALevelData;
 }
