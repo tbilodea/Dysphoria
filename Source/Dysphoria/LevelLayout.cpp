@@ -6,6 +6,7 @@
 #include "RoomData.h"
 
 #include <cmath>
+#include "Dysphoria.h"
 
 void ULevelLayout::Setup(const int32 RowRooms, const int32 ColRooms)
 {
@@ -29,7 +30,7 @@ void ULevelLayout::Build()
 	PlaceEntranceRoom();
 	PlaceBossRoom();
 
-	UE_LOG(LogTemp, Log, TEXT("Finished Level Layout Build"));
+	UE_LOG(LogLevelGeneration, Log, TEXT("Finished Level Layout Build"));
 }
 
 ULevelData* ULevelLayout::GetLevelData()
@@ -38,7 +39,7 @@ ULevelData* ULevelLayout::GetLevelData()
 	{
 		LevelData = NewObject<ULevelData>();
 		LevelData->InitializeLevelDataMap(5, 5, 1);
-		UE_LOG(LogTemp, Warning, TEXT("While getting level data in ULevelLayout, the map was not initialized. Returning an empty map."));
+		UE_LOG(LogLevelGeneration, Warning, TEXT("While getting level data in ULevelLayout, the map was not initialized. Returning an empty map."));
 	}
 
 	return LevelData;
@@ -73,7 +74,7 @@ void ULevelLayout::ConnectAllRooms()
 
 
 		if (InMapNeighbor.Row == -1) {
-			UE_LOG(LogTemp, Warning, TEXT("Could not find a neighbor to attach for [%i, %i], removing it from the frontier list."), SelectedFrontierRoom.Row, SelectedFrontierRoom.Col);
+			UE_LOG(LogLevelGeneration, Warning, TEXT("Could not find a neighbor to attach for [%i, %i], removing it from the frontier list."), SelectedFrontierRoom.Row, SelectedFrontierRoom.Col);
 			Frontier.Remove(SelectedFrontierRoom);
 			continue;
 		}
@@ -87,7 +88,7 @@ void ULevelLayout::ConnectAllRooms()
 		// add any neighbor rooms without doors to the frontier (not already assigned)
 		Frontier.Append(LevelData->GetNeighborsWithoutDoors(SelectedFrontierRoom));
 	}
-	UE_LOG(LogTemp, Log, TEXT("Finished Connecting Rooms"));
+	UE_LOG(LogLevelGeneration, Log, TEXT("Finished Connecting Rooms"));
 }
 
 //Chosing a first row cell to be the start room
@@ -106,28 +107,35 @@ void ULevelLayout::PlaceBossRoom()
 	FRoomLocation BossRoom;
 	BossRoom.Row = LevelData->GetRows() - 1;
 	BossRoom.Col = RandomStream.RandRange(0, LevelData->GetCols() - 1);
-
-	//FIXME Currently has an issue reattaching rooms, don't use until it's fixed
-	/*
+		
 	auto RoomsAroundBoss = LevelData->GetRoomsAround(BossRoom);
 
 	//Add connections between every room next to each other
 	for (auto& RoomAroundBoss : RoomsAroundBoss) {
 		for (auto& ASecondRoom : RoomsAroundBoss) {
-			if (abs(RoomAroundBoss.Row - ASecondRoom.Row) == 1 || abs(RoomAroundBoss.Col - ASecondRoom.Col) == 1) {
+			if (( abs(RoomAroundBoss.Row - ASecondRoom.Row) == 1 
+				 && RoomAroundBoss.Col == ASecondRoom.Col )
+				|| ( RoomAroundBoss.Row == ASecondRoom.Row
+				 && abs(RoomAroundBoss.Col - ASecondRoom.Col) == 1 )) {
 				LevelData->AddDoorsBetween(RoomAroundBoss, ASecondRoom);
+				UE_LOG(LogLevelGeneration, Log, TEXT("Connecting [%i, %i] and [%i, %i]"), RoomAroundBoss.Row, RoomAroundBoss.Col, ASecondRoom.Row, ASecondRoom.Col);
 			}
 		}
-		//Preemptively disconnect the rooms from the boss room
-		LevelData->RemoveDoorsBetween(BossRoom, RoomAroundBoss);
+		//Disconnect all the adjacent rooms from the boss room
+		if (abs(RoomAroundBoss.Row - BossRoom.Row) + abs(BossRoom.Col - RoomAroundBoss.Col) == 1) {
+			UE_LOG(LogLevelGeneration, Log, TEXT("Removing connection between boss room and [%i, %i]"), RoomAroundBoss.Row, RoomAroundBoss.Col);
+			LevelData->RemoveDoorsBetween(BossRoom, RoomAroundBoss);
+		}
 	}
 
 	auto& RoomToConnect = RoomsAroundBoss[RandomStream.RandRange(0, RoomsAroundBoss.Num() - 1)];
 
-	LevelData->AddDoorsBetween(BossRoom, RoomToConnect); */
+	UE_LOG(LogLevelGeneration, Log, TEXT("Boss Room connected to [%i, %i]"), RoomToConnect.Row, RoomToConnect.Col);
+
+	LevelData->AddDoorsBetween(BossRoom, RoomToConnect);
 	LevelData->SetBossRoom(BossRoom);
 
-	UE_LOG(LogTemp, Log, TEXT("Finished Setting Boss Room"));
+	UE_LOG(LogLevelGeneration, Log, TEXT("Finished Setting Boss Room"));
 }
 
 void ULevelLayout::AddExtraDoors()
@@ -158,7 +166,7 @@ void ULevelLayout::AddExtraDoors()
 		LevelData->AddDoorsBetween(RandomLocation, NeighborLocation);
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("Finished Adding Extra Room Connections"));
+	UE_LOG(LogLevelGeneration, Log, TEXT("Finished Adding Extra Room Connections"));
 }
 
 FRoomLocation ULevelLayout::GetRandomLocation() const

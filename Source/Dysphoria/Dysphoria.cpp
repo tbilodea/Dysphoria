@@ -6,3 +6,4 @@
 IMPLEMENT_PRIMARY_GAME_MODULE( FDefaultGameModuleImpl, Dysphoria, "Dysphoria" );
 
 DEFINE_LOG_CATEGORY(LogSwarmEngine);
+DEFINE_LOG_CATEGORY(LogLevelGeneration);
