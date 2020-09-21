@@ -128,7 +128,8 @@ void ULevelLayout::PlaceBossRoom()
 		}
 	}
 
-	auto& RoomToConnect = RoomsAroundBoss[RandomStream.RandRange(0, RoomsAroundBoss.Num() - 1)];
+	auto NeighborsToBoss = LevelData->GetNeighborsOf(BossRoom);
+	auto& RoomToConnect = NeighborsToBoss[RandomStream.RandRange(0, NeighborsToBoss.Num() - 1)];
 
 	UE_LOG(LogLevelGeneration, Log, TEXT("Boss Room connected to [%i, %i]"), RoomToConnect.Row, RoomToConnect.Col);
 

@@ -3,6 +3,7 @@
 
 #include "LevelData.h"
 
+#include "RowCol.h"
 #include "DirectionUtils.h"
 
 //Initialize the map with the appropriate rows/cols of empty RoomDatas
@@ -223,6 +224,16 @@ FRoomLocation ULevelData::GetEntrance() const
 	return Entrance;
 }
 
+URowCol * ULevelData::GetBossRoomLocation()
+{
+	return CreateRowCol(BossRoom);
+}
+
+URowCol * ULevelData::GetEntranceLocation()
+{
+	return CreateRowCol(Entrance);
+}
+
 //Adds the walls to the rooms, TODO there's no error handling here for if they are not next to each other
 void ULevelData::AddDoorsBetween(const FRoomLocation & Room1, const FRoomLocation & Room2)
 {
@@ -298,6 +309,14 @@ Direction ULevelData::GetDirectionBetweenRooms(const FRoomLocation& Room1, const
 
 	UE_LOG(LogTemp, Warning, TEXT("Room 1 at [%i, %i] and 2 [%i, %i] aren't next to each other, returning a default of NORTH"), Room1.Row, Room1.Col, Room2.Row, Room2.Col);
 	return Direction::NORTH;
+}
+
+URowCol * ULevelData::CreateRowCol(const FRoomLocation RoomLoc)
+{
+	URowCol* RowCol = NewObject<URowCol>();
+	RowCol->SetRow(RoomLoc.Row);
+	RowCol->SetCol(RoomLoc.Col);
+	return RowCol;
 }
 
 // TEST FUNCTIONS

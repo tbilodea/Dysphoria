@@ -65,6 +65,9 @@ void AFirstPersonController::SetupPlayerInputComponent(UInputComponent* PlayerIn
 
 	//Fire
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AFirstPersonController::Fire);
+
+	//Brings up level map
+	PlayerInputComponent->BindAction("ToggleMap", IE_Pressed, this, &AFirstPersonController::ToggleMap).bExecuteWhenPaused = true;
 }
 
 void AFirstPersonController::MoveForward(float Value)

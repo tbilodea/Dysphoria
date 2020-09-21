@@ -61,10 +61,18 @@ public:
 	//Grabs the Directions that there are neighbors (if it exists on the edge of the map, not all directions will be present)
 	TArray<Direction> GetNeighborDirections(const FRoomLocation & RoomLocation) const;
 
+	UFUNCTION(BlueprintCallable)
 	int32 GetRows() const;
+	UFUNCTION(BlueprintCallable)
 	int32 GetCols() const;
+
 	FRoomLocation GetBossRoom() const;
 	FRoomLocation GetEntrance() const;
+
+	UFUNCTION(BlueprintCallable)
+	URowCol* GetBossRoomLocation();
+	UFUNCTION(BlueprintCallable)
+	URowCol* GetEntranceLocation();
 
 	//Methods to manipulate underlying data
 	void AddDoorsBetween(const FRoomLocation& Room1, const FRoomLocation& Room2);
@@ -100,4 +108,5 @@ private:
 	TMap<FRoomLocation, URoomData*> LevelRooms;
 
 	Direction GetDirectionBetweenRooms(const FRoomLocation& Room1, const FRoomLocation& Room2) const;
+	URowCol* CreateRowCol(const FRoomLocation RoomLoc);
 };

@@ -25,6 +25,9 @@ public:
 	void GenerateLevel(const int32 level);
 
 	UFUNCTION(BlueprintCallable)
+	ULevelData* GetLevelData() const;
+
+	UFUNCTION(BlueprintCallable)
 	URoomData* GetRoom(int32 Row, int32 Col) const;
 
 	UFUNCTION(BlueprintCallable)

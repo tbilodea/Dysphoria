@@ -20,6 +20,11 @@ void ULevelGenerator::GenerateLevel(const int32 Level)
 	LevelData = Layout->GetLevelData();
 }
 
+ULevelData* ULevelGenerator::GetLevelData() const
+{
+	return LevelData;
+}
+
 URoomData* ULevelGenerator::GetRoom(int32 Row, int32 Col) const
 {
 	return LevelData->GetRoomData(Row, Col);

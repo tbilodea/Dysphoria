@@ -43,6 +43,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	FVector MuzzleOffset;
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void ToggleMap();
+
 private:
 	float SpeedMultiplier = 1.0f;
 	float BaseSpeed = 0.f;
@@ -71,4 +74,5 @@ private:
 
 	UFUNCTION()
 	void Fire();  //For firing projectiles
+
 };
