@@ -68,6 +68,14 @@ void AFirstPersonController::SetupPlayerInputComponent(UInputComponent* PlayerIn
 
 	//Brings up level map
 	PlayerInputComponent->BindAction("ToggleMap", IE_Pressed, this, &AFirstPersonController::ToggleMap).bExecuteWhenPaused = true;
+
+	//Switch Weapon
+	PlayerInputComponent->BindAction("SwapToGun", IE_Pressed, this, &AFirstPersonController::SwapToGun);
+	PlayerInputComponent->BindAction("SwapToSword", IE_Pressed, this, &AFirstPersonController::SwapToSword);
+	PlayerInputComponent->BindAction("SwapWeapon", IE_Pressed, this, &AFirstPersonController::SwapWeapon);
+
+	//Reload
+	PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &AFirstPersonController::Reload);
 }
 
 void AFirstPersonController::MoveForward(float Value)
@@ -141,4 +149,23 @@ void AFirstPersonController::Fire()
 FVector AFirstPersonController::GetLocation()
 {
 	return this->GetActorLocation();
+}
+
+void AFirstPersonController::SwapToGun()
+{
+	if (ActiveWeapon != GunType) {
+		SwapWeapon();
+	}
+}
+
+void AFirstPersonController::SwapToSword()
+{
+	if (ActiveWeapon != SwordType) {
+		SwapWeapon();
+	}
+}
+
+void AFirstPersonController::Reload()
+{
+	
 }

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "PlayerEntity.h"
+#include "WeaponType.h";
 #include "FirstPersonController.generated.h"
 
 class UCameraComponent;
@@ -46,11 +47,21 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void ToggleMap();
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void SwapWeapon();
+
 private:
 	float SpeedMultiplier = 1.0f;
 	float BaseSpeed = 0.f;
 	float ControllerYawSensitivity = 1.f;
 	float ControllerPitchSensitivity = 1.f;
+	
+	// Default types of Gun/Sword
+	EWeaponType GunType = EWeaponType::REVOLVER;
+	EWeaponType SwordType = EWeaponType::BASTARD;
+
+	// Current Weapon in use
+	EWeaponType ActiveWeapon = GunType;
 
 	// FPS camera.
 	UPROPERTY(VisibleAnywhere)
@@ -74,5 +85,14 @@ private:
 
 	UFUNCTION()
 	void Fire();  //For firing projectiles
+
+	UFUNCTION()
+	void SwapToGun();
+
+	UFUNCTION()
+	void SwapToSword();
+
+	UFUNCTION()
+	void Reload();
 
 };
