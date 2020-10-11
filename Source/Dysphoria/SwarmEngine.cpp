@@ -176,7 +176,7 @@ void USwarmEngine::RemoveDeadEnemies()
 	TArray<AAIEntity*> NewRoomEnemies = TArray<AAIEntity*>();
 
 	for (auto& Entity : RoomEnemies) {
-		if (Entity->GetWellness() > 0) {
+		if (Entity && Entity->GetWellness() > 0) {
 			NewRoomEnemies.Add(Entity);
 			UE_LOG(LogSwarmEngine, VeryVerbose, TEXT("Room Enemies list refreshed with %s"), *Entity->GetName());
 		}
