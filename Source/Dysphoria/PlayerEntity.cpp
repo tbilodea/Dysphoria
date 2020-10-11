@@ -7,10 +7,10 @@
 
 APlayerEntity::APlayerEntity()
 {
-	for (auto enemyType : EnemyTypeUtils::GetAllTypes())
-	{
-		int32 zero = 0;
-		DamageToEnemies.insert(std::make_pair(enemyType, zero));
+	//Initialize the damage and kills map to zero
+	for (auto EnemyType : EnemyTypeUtils::GetAllTypes()) {
+		DamageToEnemies.Add(EnemyType, 0);
+		KillsToEnemies.Add(EnemyType, 0);
 	}
 }
 
@@ -21,22 +21,17 @@ int32 APlayerEntity::GetWellness() const
 
 int32 APlayerEntity::GetKillsOn(EEnemyType & type)
 {
-	auto it = KillsToEnemies.find(type);
-	if (it == KillsToEnemies.end()) {
-		return 0;
-	}
-	return it->second;
+	return *KillsToEnemies.Find(type);
 }
 
-void APlayerEntity::SetWellness(const int32 newWellness)
+void APlayerEntity::SetWellness(const int32 NewWellness)
 {
-	Wellness = newWellness;
+	Wellness = NewWellness;
 }
 
-void APlayerEntity::AddDamageTo(const EEnemyType type, const int32 damage)
+void APlayerEntity::AddDamageTo(const EEnemyType Type, const int32 Damage)
 {
-	auto it = DamageToEnemies.find(type);
-	if (it != DamageToEnemies.end()) {
-		it->second = it->second + damage;
-	}
+	auto IntPtr = DamageToEnemies.Find(Type);
+	int32 NewTotalDamage = ( *IntPtr + Damage );
+	DamageToEnemies.Add(Type, NewTotalDamage);
 }

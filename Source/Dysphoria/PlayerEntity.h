@@ -33,9 +33,9 @@ protected:
 	void AddDamageTo(const EEnemyType type, const int32 damage);
 
 private:
-	//Damage done to enemy types
-	std::map<EEnemyType, int32> DamageToEnemies = std::map<EEnemyType, int32>();
-	std::map<EEnemyType, int32> KillsToEnemies = std::map<EEnemyType, int32>();
+	//Damage done and kills to enemy types
+	TMap<EEnemyType, int32> DamageToEnemies;
+	TMap<EEnemyType, int32> KillsToEnemies;
 
 	//wellness of player
 	int32 Wellness = 100;
