@@ -11,8 +11,8 @@ enum class EWeaponType : uint8 {
 	SEMI_AUTO,
 	GLOCK,
 	GLASS_CANNON,
-	KATANA,
 	BASTARD,
+	KATANA,
 	KHOPESH,
 	GLASS_CLAYMORE
 };

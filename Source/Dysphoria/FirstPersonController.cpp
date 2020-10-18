@@ -26,6 +26,13 @@ AFirstPersonController::AFirstPersonController()
 	// Disable some environmental shadowing to preserve the illusion of having a single mesh.
 	FPSMesh->bCastDynamicShadow = false;
 	FPSMesh->CastShadow = false;
+
+	//Initialize Weapons
+	GunWeapon = NewObject<UGun>();
+	SwordWeapon = NewObject<USword>();
+
+	GunWeapon->SetupWeaponFor(EWeaponType::REVOLVER);
+	SwordWeapon->SetupWeaponFor(EWeaponType::BASTARD);
 }
 
 // Called when the game starts or when spawned
@@ -115,6 +122,12 @@ void AFirstPersonController::StopJump()
 void AFirstPersonController::Fire()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Fire"));
+
+	//TODO figure out sword hitboxes (one in front, one below)
+
+	
+	//TODO switch Projectile setup to be just raytrace
+
 	// Attempt to fire a projectile.
 	if (ProjectileClass)
 	{
@@ -153,19 +166,19 @@ FVector AFirstPersonController::GetLocation()
 
 void AFirstPersonController::SwapToGun()
 {
-	if (ActiveWeapon != GunType) {
+	if (!UsingGun) {
 		SwapWeapon();
 	}
 }
 
 void AFirstPersonController::SwapToSword()
 {
-	if (ActiveWeapon != SwordType) {
+	if (UsingGun) {
 		SwapWeapon();
 	}
 }
 
 void AFirstPersonController::Reload()
 {
-	
+	///TODO utilize the UWeapon reload
 }

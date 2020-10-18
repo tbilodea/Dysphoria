@@ -6,3 +6,4 @@
 
 DECLARE_LOG_CATEGORY_EXTERN(LogSwarmEngine, All, All);
 DECLARE_LOG_CATEGORY_EXTERN(LogLevelGeneration, All, All);
+DECLARE_LOG_CATEGORY_EXTERN(LogFPSController, All, All);

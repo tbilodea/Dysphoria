@@ -5,7 +5,9 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "PlayerEntity.h"
-#include "WeaponType.h";
+#include "WeaponType.h"
+#include "Gun.h"
+#include "Sword.h"
 #include "FirstPersonController.generated.h"
 
 class UCameraComponent;
@@ -57,11 +59,11 @@ private:
 	float ControllerPitchSensitivity = 1.f;
 	
 	// Default types of Gun/Sword
-	EWeaponType GunType = EWeaponType::REVOLVER;
-	EWeaponType SwordType = EWeaponType::BASTARD;
+	UGun* GunWeapon;
+	USword* SwordWeapon;
 
 	// Current Weapon in use
-	EWeaponType ActiveWeapon = GunType;
+	bool UsingGun = true;
 
 	// FPS camera.
 	UPROPERTY(VisibleAnywhere)
