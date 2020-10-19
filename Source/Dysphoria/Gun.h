@@ -36,6 +36,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	int32 GetMaxAmmo();
 
+	void DecrementCurrentUses();
+
 	bool IsSwordType();
 
 private:

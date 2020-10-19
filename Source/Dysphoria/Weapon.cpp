@@ -3,11 +3,6 @@
 
 #include "Weapon.h"
 
-void UWeapon::SetupWeaponFor(EWeaponType NewWeaponType) 
-{
-	//Don't use
-}
-
 EWeaponType UWeapon::GetWeaponType()
 {
 	return WeaponType;

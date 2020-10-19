@@ -30,6 +30,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	int32 GetSwipesBeforeReset();
 
+	UFUNCTION(BlueprintCallable)
+	int32 GetCurrentSwipesLeft();
+
+	void DecrementCurrentUses();
+
 	bool IsSwordType();
 
 private:
@@ -37,4 +42,5 @@ private:
 	float TimeBetweenReset;
 	int32 DamagePerStrike;
 	int32 SwipesBeforeReset;
+	int32 CurrentSwipesLeft;
 };

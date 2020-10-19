@@ -16,8 +16,11 @@ class DYSPHORIA_API UWeapon : public UObject
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintImplementableEvent)
 	void SetupWeaponFor(EWeaponType NewWeaponType);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void DecrementCurrentUses();
 
 	UFUNCTION(BlueprintCallable)
 	EWeaponType GetWeaponType();

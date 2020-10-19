@@ -15,7 +15,6 @@ void UGun::SetupWeaponFor(EWeaponType NewWeaponType)
 		ReloadTime = 4.0f;
 		DamagePerStrike = 16;
 		MaxAmmo = 6;
-		CurrentAmmo = MaxAmmo;
 		break;
 	case EWeaponType::SEMI_AUTO:
 		Recoil = 0.2f;
@@ -23,7 +22,6 @@ void UGun::SetupWeaponFor(EWeaponType NewWeaponType)
 		ReloadTime = 3.5f;
 		DamagePerStrike = 9;
 		MaxAmmo = 6;
-		CurrentAmmo = MaxAmmo;
 		break;
 	case EWeaponType::GLOCK:
 		Recoil = 0.08f;
@@ -31,7 +29,6 @@ void UGun::SetupWeaponFor(EWeaponType NewWeaponType)
 		ReloadTime = 6.0f;
 		DamagePerStrike = 5;
 		MaxAmmo = 15;
-		CurrentAmmo = MaxAmmo;
 		break;
 	case EWeaponType::GLASS_CANNON:
 		Recoil = 1.0f;
@@ -39,11 +36,13 @@ void UGun::SetupWeaponFor(EWeaponType NewWeaponType)
 		ReloadTime = 10.0f;
 		DamagePerStrike = 200;
 		MaxAmmo = 1;
-		CurrentAmmo = MaxAmmo;
 		break;
 	default:
 		UE_LOG(LogTemp, Warning, TEXT("Encountered Sword or other EWeaponType type in UGun::SetupWeaponFor [%i]"), NewWeaponType);
 	}
+
+	CurrentAmmo = MaxAmmo;
+
 }
 
 float UGun::GetRecoil()
@@ -74,6 +73,11 @@ int32 UGun::GetCurrentAmmo()
 int32 UGun::GetMaxAmmo()
 {
 	return MaxAmmo;
+}
+
+void UGun::DecrementCurrentUses()
+{
+	CurrentAmmo--;
 }
 
 bool UGun::IsSwordType()

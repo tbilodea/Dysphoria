@@ -36,6 +36,8 @@ void USword::SetupWeaponFor(EWeaponType NewWeaponType)
 	default:
 		UE_LOG(LogTemp, Warning, TEXT("Encountered Gun or other EWeaponType type in USword::SetupWeaponFor [%i]"), NewWeaponType);
 	}
+	//Reseting swipe count
+	CurrentSwipesLeft = SwipesBeforeReset;
 }
 
 float USword::GetTimeBetweenStrikes()
@@ -56,6 +58,16 @@ int32 USword::GetDamagePerStrike()
 int32 USword::GetSwipesBeforeReset()
 {
 	return SwipesBeforeReset;
+}
+
+int32 USword::GetCurrentSwipesLeft()
+{
+	return CurrentSwipesLeft;
+}
+
+void USword::DecrementCurrentUses()
+{
+	CurrentSwipesLeft--;
 }
 
 bool USword::IsSwordType()
