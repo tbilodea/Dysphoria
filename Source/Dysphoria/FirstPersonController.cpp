@@ -121,7 +121,7 @@ void AFirstPersonController::StopJump()
 
 void AFirstPersonController::Fire()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Fire"));
+	UE_LOG(LogFPSController, Warning, TEXT("Fire"));
 
 	//TODO figure out sword hitboxes (one in front, one below)
 
