@@ -39,6 +39,9 @@ public:
 
 	bool TimersAllowFiring();
 
+	UFUNCTION()
+	void OnTimerBetweenStrikesExpires();
+
 private:
 	float Recoil;
 	float ReloadTime;
@@ -48,8 +51,6 @@ private:
 
 	int32 CurrentAmmo;
 	FTimerHandle TimerBetweenStrikesHandle;
-	bool AllowGunToFire = true;
 
-	UFUNCTION()
-	void OnTimerBetweenStrikesExpires();
+	bool AllowGunToFire = true;
 };

@@ -2,7 +2,6 @@
 
 
 #include "Weapon.h"
-
 #include "Engine/World.h"
 
 EWeaponType UWeapon::GetWeaponType()
@@ -28,8 +27,8 @@ void UWeapon::BeginDestroy()
 	Super::BeginDestroy();
 
 	//Clean up timers
-	if (GetWorld() && this) {
-		GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
+	if (GetOuter()->GetWorld() && this) {
+		GetOuter()->GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
 	}
 }
 

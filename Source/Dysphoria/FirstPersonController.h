@@ -52,6 +52,9 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void SwapWeapon();
 
+	UFUNCTION(BlueprintCallable)
+	UWeapon* GetCurrentWeapon();
+
 private:
 	float SpeedMultiplier = 1.0f;
 	float BaseSpeed = 0.f;

@@ -4,8 +4,6 @@
 #include "Gun.h"
 #include "WeaponType.h"
 
-#include "Engine/World.h"
-
 void UGun::SetupWeaponFor(EWeaponType NewWeaponType)
 {
 	SetWeaponType(NewWeaponType);
@@ -80,7 +78,14 @@ void UGun::DecrementCurrentUses()
 
 	//Wait for the timer between firing to expire (timer cleaned up in beginDestory on Weapon)
 	AllowGunToFire = false;
-	GetWorld()->GetTimerManager().SetTimer(TimerBetweenStrikesHandle, this, &UGun::OnTimerBetweenStrikesExpires, TimeBetweenStrikes, false);
+	FTimerDelegate TimerDel;
+	TimerDel.BindUFunction(this, FName("OnTimerBetweenStrikesExpires"));
+	//FTimerHandle& InOutHandle, FTimerDelegate const& InDelegate, float InRate, bool InbLoop
+	if (!GetOuter()->GetWorld()) {
+		UE_LOG(LogTemp, Warning, TEXT("instance is null"));
+	} else {
+		GetOuter()->GetWorld()->GetTimerManager().SetTimer(TimerBetweenStrikesHandle, TimerDel, TimeBetweenStrikes, false);
+	}
 }
 
 bool UGun::IsSwordType()

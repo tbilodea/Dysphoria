@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "WeaponType.h"
+#include "TimerManager.h" 
 #include "Weapon.generated.h"
 
 /**
@@ -25,7 +26,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	EWeaponType GetWeaponType();
 
-	UFUNCTION(BlueprintImplementableEvent)
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	bool IsSwordType();
 
 	//Sets the weapon to broken

@@ -29,8 +29,8 @@ AFirstPersonController::AFirstPersonController()
 	FPSMesh->CastShadow = false;
 
 	//Initialize Weapons
-	GunWeapon = NewObject<UGun>();
-	SwordWeapon = NewObject<USword>();
+	GunWeapon = CreateDefaultSubobject<UGun>(TEXT("Gun"));
+	SwordWeapon = CreateDefaultSubobject<USword>(TEXT("Sword"));
 
 	GunWeapon->SetupWeaponFor(EWeaponType::REVOLVER);
 	SwordWeapon->SetupWeaponFor(EWeaponType::BASTARD);
@@ -41,6 +41,14 @@ void AFirstPersonController::BeginPlay()
 {
 	Super::BeginPlay();
 	
+}
+
+UWeapon * AFirstPersonController::GetCurrentWeapon()
+{
+	if (UsingGun)
+		return GunWeapon;
+	else
+		return SwordWeapon;
 }
 
 // Called every frame
