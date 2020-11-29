@@ -35,6 +35,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool IsBroken();
 
+	void BeginDestroy();
+
 protected:
 	UFUNCTION()
 	void SetWeaponType(EWeaponType NewWeaponType);

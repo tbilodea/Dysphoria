@@ -2,6 +2,7 @@
 
 
 #include "FirstPersonController.h"
+#include "Dysphoria.h"
 #include "FPSProjectile.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -123,13 +124,42 @@ void AFirstPersonController::Fire()
 {
 	UE_LOG(LogFPSController, Warning, TEXT("Fire"));
 
-	//TODO figure out sword hitboxes (one in front, one below)
+	// Determine if sword or gun is out
+	if (UsingGun) {
+		//Gun has to have ammo to utilize and not be flagged as broken
+		if (GunWeapon->IsBroken() || GunWeapon->GetCurrentAmmo() <= 0) {
+			// Out of ammo
 
-	
-	//TODO switch Projectile setup to be just raytrace
+			//TODO audio empty click of whatever type?
+
+			return;
+		}
+
+		if (GunWeapon->TimersAllowFiring()) {
+			GunWeapon->DecrementCurrentUses();
+
+			// Get the camera transform.
+			FVector CameraLocation;
+			FRotator CameraRotation;
+			GetActorEyesViewPoint(CameraLocation, CameraRotation);
+
+			// Transform MuzzleOffset from camera space to world space.
+			FVector MuzzleLocation = CameraLocation + FTransform(CameraRotation).TransformVector(MuzzleOffset);
+			FRotator MuzzleRotation = CameraRotation;
+
+			//TODO switch Projectile setup to be just raytrace
+
+			// Create Recoil
+			MuzzleRotation.Pitch += GunWeapon->GetRecoil();
+		}
+	}
+	else {
+
+		//TODO figure out sword hitboxes (one in front, one below)
+	}
 
 	// Attempt to fire a projectile.
-	if (ProjectileClass)
+	/*if (ProjectileClass)
 	{
 		// Get the camera transform.
 		FVector CameraLocation;
@@ -156,7 +186,7 @@ void AFirstPersonController::Fire()
 				Projectile->FireInDirection(LaunchDirection);
 			}
 		}
-	}
+	}*/
 }
 
 FVector AFirstPersonController::GetLocation()

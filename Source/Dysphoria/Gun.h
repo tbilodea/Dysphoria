@@ -22,9 +22,6 @@ public:
 	float GetRecoil();
 
 	UFUNCTION(BlueprintCallable)
-	float GetTimeBetweenStrikes();
-
-	UFUNCTION(BlueprintCallable)
 	float GetReloadTime();
 
 	UFUNCTION(BlueprintCallable)
@@ -40,11 +37,19 @@ public:
 
 	bool IsSwordType();
 
+	bool TimersAllowFiring();
+
 private:
 	float Recoil;
-	float TimeBetweenStrikes;
 	float ReloadTime;
+	float TimeBetweenStrikes;
 	int32 DamagePerStrike;
 	int32 MaxAmmo;
+
 	int32 CurrentAmmo;
+	FTimerHandle TimerBetweenStrikesHandle;
+	bool AllowGunToFire = true;
+
+	UFUNCTION()
+	void OnTimerBetweenStrikesExpires();
 };

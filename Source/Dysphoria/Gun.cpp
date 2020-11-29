@@ -4,34 +4,36 @@
 #include "Gun.h"
 #include "WeaponType.h"
 
+#include "Engine/World.h"
+
 void UGun::SetupWeaponFor(EWeaponType NewWeaponType)
 {
 	SetWeaponType(NewWeaponType);
 
 	switch (NewWeaponType) {
 	case EWeaponType::REVOLVER:
-		Recoil = 0.3f;
+		Recoil = 25.0f;
 		TimeBetweenStrikes = 0.8f;
 		ReloadTime = 4.0f;
 		DamagePerStrike = 16;
 		MaxAmmo = 6;
 		break;
 	case EWeaponType::SEMI_AUTO:
-		Recoil = 0.2f;
+		Recoil = 8.0f;
 		TimeBetweenStrikes = 0.6f;
 		ReloadTime = 3.5f;
 		DamagePerStrike = 9;
 		MaxAmmo = 6;
 		break;
 	case EWeaponType::GLOCK:
-		Recoil = 0.08f;
+		Recoil = 2.0f;
 		TimeBetweenStrikes = 0.1f;
 		ReloadTime = 6.0f;
 		DamagePerStrike = 5;
 		MaxAmmo = 15;
 		break;
 	case EWeaponType::GLASS_CANNON:
-		Recoil = 1.0f;
+		Recoil = 50.0f;
 		TimeBetweenStrikes = 5.0f;
 		ReloadTime = 10.0f;
 		DamagePerStrike = 200;
@@ -42,17 +44,11 @@ void UGun::SetupWeaponFor(EWeaponType NewWeaponType)
 	}
 
 	CurrentAmmo = MaxAmmo;
-
 }
 
 float UGun::GetRecoil()
 {
 	return Recoil;
-}
-
-float UGun::GetTimeBetweenStrikes()
-{
-	return TimeBetweenStrikes;
 }
 
 float UGun::GetReloadTime()
@@ -78,9 +74,27 @@ int32 UGun::GetMaxAmmo()
 void UGun::DecrementCurrentUses()
 {
 	CurrentAmmo--;
+	if (GetWeaponType() == EWeaponType::GLASS_CANNON) {
+		BreakWeapon();
+	}
+
+	//Wait for the timer between firing to expire (timer cleaned up in beginDestory on Weapon)
+	AllowGunToFire = false;
+	GetWorld()->GetTimerManager().SetTimer(TimerBetweenStrikesHandle, this, &UGun::OnTimerBetweenStrikesExpires, TimeBetweenStrikes, false);
 }
 
 bool UGun::IsSwordType()
 {
 	return false;
 }
+
+bool UGun::TimersAllowFiring()
+{
+	return AllowGunToFire;
+}
+
+void UGun::OnTimerBetweenStrikesExpires()
+{
+	AllowGunToFire = true;
+}
+

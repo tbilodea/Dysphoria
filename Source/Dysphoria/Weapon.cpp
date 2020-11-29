@@ -3,6 +3,8 @@
 
 #include "Weapon.h"
 
+#include "Engine/World.h"
+
 EWeaponType UWeapon::GetWeaponType()
 {
 	return WeaponType;
@@ -19,6 +21,16 @@ void UWeapon::BreakWeapon()
 bool UWeapon::IsBroken()
 {
 	return IsBrokenWeapon;
+}
+
+void UWeapon::BeginDestroy()
+{
+	Super::BeginDestroy();
+
+	//Clean up timers
+	if (GetWorld() && this) {
+		GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
+	}
 }
 
 void UWeapon::SetWeaponType(EWeaponType NewWeaponType)
