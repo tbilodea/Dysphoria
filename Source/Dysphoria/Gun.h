@@ -35,12 +35,17 @@ public:
 
 	void DecrementCurrentUses();
 
+	void StartReload();
+
 	bool IsSwordType();
 
 	bool TimersAllowFiring();
 
 	UFUNCTION()
 	void OnTimerBetweenStrikesExpires();
+
+	UFUNCTION()
+	void OnReloadTimerExpires();
 
 private:
 	float Recoil;
@@ -51,6 +56,8 @@ private:
 
 	int32 CurrentAmmo;
 	FTimerHandle TimerBetweenStrikesHandle;
+	FTimerHandle ReloadTimerHandle;
 
 	bool AllowGunToFire = true;
+	bool Reloading = false;
 };

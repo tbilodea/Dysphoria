@@ -43,6 +43,12 @@ void AFirstPersonController::BeginPlay()
 	
 }
 
+void AFirstPersonController::SwapWeapon()
+{
+	UE_LOG(LogFPSController, Log, TEXT("Swapping weapons"));
+	UsingGun = !UsingGun;
+}
+
 UWeapon * AFirstPersonController::GetCurrentWeapon()
 {
 	if (UsingGun)
@@ -130,7 +136,7 @@ void AFirstPersonController::StopJump()
 
 void AFirstPersonController::Fire()
 {
-	UE_LOG(LogFPSController, Warning, TEXT("Fire"));
+	UE_LOG(LogFPSController, Warning, TEXT("Fire Pressed"));
 
 	// Determine if sword or gun is out
 	if (UsingGun) {
@@ -218,5 +224,7 @@ void AFirstPersonController::SwapToSword()
 
 void AFirstPersonController::Reload()
 {
-	///TODO utilize the UWeapon reload
+	if (UsingGun) {
+		GunWeapon->StartReload();
+	}
 }

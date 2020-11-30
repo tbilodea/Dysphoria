@@ -88,6 +88,15 @@ void UGun::DecrementCurrentUses()
 	}
 }
 
+void UGun::StartReload()
+{
+	//Wait for the timer between firing to expire (timer cleaned up in beginDestory on Weapon)
+	Reloading = true;
+	FTimerDelegate TimerDel;
+	TimerDel.BindUFunction(this, FName("OnReloadTimerExpires"));
+	GetOuter()->GetWorld()->GetTimerManager().SetTimer(ReloadTimerHandle, TimerDel, GetReloadTime(), false);
+}
+
 bool UGun::IsSwordType()
 {
 	return false;
@@ -95,11 +104,18 @@ bool UGun::IsSwordType()
 
 bool UGun::TimersAllowFiring()
 {
-	return AllowGunToFire;
+	return AllowGunToFire && !Reloading;
 }
 
 void UGun::OnTimerBetweenStrikesExpires()
 {
 	AllowGunToFire = true;
+}
+
+void UGun::OnReloadTimerExpires()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Reload Finished"));
+	CurrentAmmo = MaxAmmo;
+	Reloading = false;
 }
 

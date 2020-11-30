@@ -49,7 +49,7 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void ToggleMap();
 
-	UFUNCTION(BlueprintImplementableEvent)
+	UFUNCTION(BlueprintCallable)
 	void SwapWeapon();
 
 	UFUNCTION(BlueprintCallable)
