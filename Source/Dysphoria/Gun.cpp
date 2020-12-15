@@ -78,23 +78,20 @@ void UGun::DecrementCurrentUses()
 
 	//Wait for the timer between firing to expire (timer cleaned up in beginDestory on Weapon)
 	AllowGunToFire = false;
-	FTimerDelegate TimerDel;
-	TimerDel.BindUFunction(this, FName("OnTimerBetweenStrikesExpires"));
-	//FTimerHandle& InOutHandle, FTimerDelegate const& InDelegate, float InRate, bool InbLoop
 	if (!GetOuter()->GetWorld()) {
 		UE_LOG(LogTemp, Warning, TEXT("instance is null"));
 	} else {
-		GetOuter()->GetWorld()->GetTimerManager().SetTimer(TimerBetweenStrikesHandle, TimerDel, TimeBetweenStrikes, false);
+		GetOuter()->GetWorld()->GetTimerManager().SetTimer(TimerBetweenStrikesHandle, this, &UGun::OnTimerBetweenStrikesExpires, TimeBetweenStrikes, false);
 	}
 }
 
 void UGun::StartReload()
 {
-	//Wait for the timer between firing to expire (timer cleaned up in beginDestory on Weapon)
+	//Eat input if reload is already in progres
+	if (GetOuter()->GetWorld()->GetTimerManager().IsTimerActive(ReloadTimerHandle)) { return; }
+
 	Reloading = true;
-	FTimerDelegate TimerDel;
-	TimerDel.BindUFunction(this, FName("OnReloadTimerExpires"));
-	GetOuter()->GetWorld()->GetTimerManager().SetTimer(ReloadTimerHandle, TimerDel, GetReloadTime(), false);
+	GetOuter()->GetWorld()->GetTimerManager().SetTimer(ReloadTimerHandle, this, &UGun::OnReloadTimerExpires, GetReloadTime());
 }
 
 bool UGun::IsSwordType()
