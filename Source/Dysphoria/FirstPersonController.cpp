@@ -6,6 +6,7 @@
 #include "FPSProjectile.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "GameFramework/PawnMovementComponent.h"
 
 // Sets default values
 AFirstPersonController::AFirstPersonController()
@@ -16,17 +17,17 @@ AFirstPersonController::AFirstPersonController()
 	//Camera setup
 	FPSCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
 	FPSCameraComponent->SetupAttachment(Cast<USceneComponent>(GetCapsuleComponent()));
-	FPSCameraComponent->SetRelativeLocation(FVector(0.f, 0.f, 50.f + BaseEyeHeight));
+	FPSCameraComponent->SetRelativeLocation(FVector(-50.f, 0.f, 50.f + BaseEyeHeight));
 	FPSCameraComponent->bUsePawnControlRotation = true;
 
 	// FPS Mesh
-	FPSMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FirstPersonMesh"));
-	// Only the owning player sees this mesh. TODO change when setting up multiplayer?
-	FPSMesh->SetOnlyOwnerSee(true);
-	FPSMesh->SetupAttachment(FPSCameraComponent);
-	// Disable some environmental shadowing to preserve the illusion of having a single mesh.
-	FPSMesh->bCastDynamicShadow = false;
-	FPSMesh->CastShadow = false;
+	//FPSMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FirstPersonMesh"));
+	 //Only the owning player sees this mesh. TODO change when setting up multiplayer?
+	//FPSMesh->SetOnlyOwnerSee(true);
+	//FPSMesh->SetupAttachment(FPSCameraComponent);
+	//// Disable some environmental shadowing to preserve the illusion of having a single mesh.
+	//FPSMesh->bCastDynamicShadow = false;
+	//FPSMesh->CastShadow = false;
 
 	//Initialize Weapons
 	GunWeapon = CreateDefaultSubobject<UGun>(TEXT("Gun"));
@@ -34,6 +35,8 @@ AFirstPersonController::AFirstPersonController()
 
 	GunWeapon->SetupWeaponFor(EWeaponType::REVOLVER);
 	SwordWeapon->SetupWeaponFor(EWeaponType::BASTARD);
+
+	GetMovementComponent()->GetNavAgentPropertiesRef().bCanCrouch = true;
 }
 
 // Called when the game starts or when spawned
@@ -45,11 +48,11 @@ void AFirstPersonController::BeginPlay()
 
 void AFirstPersonController::SwapWeapon()
 {
-	UE_LOG(LogFPSController, Log, TEXT("Swapping weapons"));
+	UE_LOG(LogFPSController, Log, TEXT("Swapping weapons before swap UsingGun is %s"), UsingGun ? TEXT("true") : TEXT("false"));
 	UsingGun = !UsingGun;
 }
 
-UWeapon * AFirstPersonController::GetCurrentWeapon()
+UWeapon* AFirstPersonController::GetCurrentWeapon()
 {
 	if (UsingGun)
 		return GunWeapon;
@@ -85,6 +88,10 @@ void AFirstPersonController::SetupPlayerInputComponent(UInputComponent* PlayerIn
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AFirstPersonController::StartJump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &AFirstPersonController::StopJump);
 
+	//Crouch
+	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &AFirstPersonController::BeginCrouch);
+	PlayerInputComponent->BindAction("Crouch", IE_Released, this, &AFirstPersonController::EndCrouch);
+
 	//Fire
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AFirstPersonController::Fire);
 
@@ -98,6 +105,16 @@ void AFirstPersonController::SetupPlayerInputComponent(UInputComponent* PlayerIn
 
 	//Reload
 	PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &AFirstPersonController::Reload);
+}
+
+void AFirstPersonController::BeginCrouch()
+{
+	Crouch();
+}
+
+void AFirstPersonController::EndCrouch()
+{
+	UnCrouch();
 }
 
 void AFirstPersonController::MoveForward(float Value)
@@ -161,15 +178,17 @@ void AFirstPersonController::Fire()
 			FVector MuzzleLocation = CameraLocation + FTransform(CameraRotation).TransformVector(MuzzleOffset);
 			FRotator MuzzleRotation = CameraRotation;
 
-			//TODO switch Projectile setup to be just raytrace
-
 			// Create Recoil
 			MuzzleRotation.Pitch += GunWeapon->GetRecoil();
+
+			//TODO switch Projectile setup to be just raytrace
+
 		}
 	}
 	else {
 
 		//TODO figure out sword hitboxes (one in front, one below)
+
 	}
 
 	// Attempt to fire a projectile.
