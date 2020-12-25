@@ -11,6 +11,7 @@
 #include "FirstPersonController.generated.h"
 
 class UCameraComponent;
+class AFPSWeapon;
 
 UCLASS()
 class DYSPHORIA_API AFirstPersonController : public APlayerEntity
@@ -43,14 +44,18 @@ protected:
 
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditDefaultsOnly, Category = Projectile)
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
 	TSubclassOf<class AFPSProjectile> ProjectileClass;
 
 	// Gun muzzle's offset from the camera location.
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gameplay")
 	FVector MuzzleOffset;
 
-	UFUNCTION(BlueprintImplementableEvent)
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Weapon")
+	void FireFPSWeapon();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Overlay")
 	void ToggleMap();
 
 	UFUNCTION(BlueprintCallable)
@@ -77,7 +82,7 @@ private:
 	UCameraComponent* FPSCameraComponent;
 
 	// First-person mesh (arms), visible only to the owning player.
-	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
+	UPROPERTY(VisibleDefaultsOnly, Category = "Mesh")
 	USkeletalMeshComponent* FPSMesh;
 
 	UFUNCTION()

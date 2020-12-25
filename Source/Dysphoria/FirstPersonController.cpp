@@ -7,6 +7,7 @@
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
+#include "FPSWeapon.h"
 
 // Sets default values
 AFirstPersonController::AFirstPersonController()
@@ -182,7 +183,7 @@ void AFirstPersonController::Fire()
 			MuzzleRotation.Pitch += GunWeapon->GetRecoil();
 
 			//TODO switch Projectile setup to be just raytrace
-
+			FireFPSWeapon();
 		}
 	}
 	else {
