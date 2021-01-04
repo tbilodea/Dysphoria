@@ -40,6 +40,8 @@ public:
 	//Exposed location for the Swarm Engine
 	FVector GetLocation();
 
+	virtual FVector GetPawnViewLocation() const override;
+
 protected:
 
 	virtual void BeginPlay() override;

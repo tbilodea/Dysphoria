@@ -228,6 +228,15 @@ FVector AFirstPersonController::GetLocation()
 	return this->GetActorLocation();
 }
 
+FVector AFirstPersonController::GetPawnViewLocation() const
+{
+	if (FPSCameraComponent)
+	{
+		return FPSCameraComponent->GetComponentLocation();
+	}
+	return Super::GetPawnViewLocation();
+}
+
 void AFirstPersonController::SwapToGun()
 {
 	if (!UsingGun) {

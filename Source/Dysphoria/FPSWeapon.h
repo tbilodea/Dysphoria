@@ -8,6 +8,7 @@
 
 class USkeletalMeshComponent;
 class UDamageType;
+class UParticleSystemComponent;
 
 UCLASS()
 class DYSPHORIA_API AFPSWeapon : public AActor
@@ -27,6 +28,12 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Damage")
 	TSubclassOf<UDamageType> DamageType;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Visuals")
+	UParticleSystemComponent* MuzzleFlash;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Visuals")
+	UParticleSystemComponent* BulletTrail;
 
 public:	
 	// Called every frame

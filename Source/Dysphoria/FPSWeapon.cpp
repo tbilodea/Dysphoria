@@ -6,6 +6,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "DrawDebugHelpers.h"
 #include "GameFramework/DamageType.h" 
+#include "Particles/ParticleSystemComponent.h"
 
 // Sets default values
 AFPSWeapon::AFPSWeapon()
@@ -54,8 +55,11 @@ void AFPSWeapon::Fire()
 			AActor* HitActor = Hit.GetActor();
 
 			UGameplayStatics::ApplyPointDamage(HitActor, 1.f, ShotDirection, Hit, OurOwner->GetInstigatorController(), this, DamageType);
+
+			DrawDebugSphere(GetWorld(), Hit.Location, 20, 26, FColor(181, 0, 0), true, 3, 0, 2);
 		}
 
 		DrawDebugLine(GetWorld(), EyeLocation, TraceEnd, FColor::Blue, false, 1.f, 0, 1.f);
+
 	}
 }
