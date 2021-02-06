@@ -7,6 +7,7 @@
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
+#include "Wall.h"
 #include "FPSWeapon.h"
 
 // Sets default values
@@ -29,6 +30,17 @@ AFirstPersonController::AFirstPersonController()
 	//// Disable some environmental shadowing to preserve the illusion of having a single mesh.
 	//FPSMesh->bCastDynamicShadow = false;
 	//FPSMesh->CastShadow = false;
+
+	//Wall jump capsule collider
+	WallJumpCapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("WallJumpCapsuleCollider"));
+	WallJumpCapsuleComponent->InitCapsuleSize(WallJumpCapsuleRadius, 80.0f); //34x88 original capsule
+	WallJumpCapsuleComponent->SetCollisionProfileName(TEXT("PlayerJump"));
+	WallJumpCapsuleComponent->SetupAttachment(Cast<USceneComponent>(GetCapsuleComponent()));
+	
+	WallJumpCapsuleComponent->CanCharacterStepUpOn = ECB_Yes;
+	WallJumpCapsuleComponent->SetShouldUpdatePhysicsVolume(false);
+	WallJumpCapsuleComponent->SetCanEverAffectNavigation(false);
+	WallJumpCapsuleComponent->bDynamicObstacle = false;
 
 	//Initialize Weapons
 	GunWeapon = CreateDefaultSubobject<UGun>(TEXT("Gun"));
@@ -65,6 +77,15 @@ UWeapon* AFirstPersonController::GetCurrentWeapon()
 void AFirstPersonController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	// If we're going up, we change gravity to be longer in the air
+	if (this->GetVelocity().Z > 0) {
+
+	}
+	else {
+		// If we're coming down, also change gravity
+
+	}
 
 }
 
@@ -145,6 +166,32 @@ void AFirstPersonController::LookUpRate(float Value)
 void AFirstPersonController::StartJump()
 {
 	bPressedJump = true;
+	
+	if (!this->CanJump()) { //means it's off the ground
+		UE_LOG(LogTemp, Log, TEXT("Trying to wall Jump"));
+
+		AActor* ClosestWall = nullptr; //Find the closest wall to the component
+		TArray<AActor*> OutOverlappingActors;
+		WallJumpCapsuleComponent->GetOverlappingActors(OutOverlappingActors, TSubclassOf<AWall>(AWall::StaticClass())); //TODO switch to wall types only
+		for (auto& PossibleWallActor : OutOverlappingActors)
+		{
+			if (!ClosestWall || FVector::Dist(PossibleWallActor->GetActorLocation(), this->GetActorLocation()) < FVector::Dist(ClosestWall->GetActorLocation(), this->GetActorLocation())) {
+				ClosestWall = PossibleWallActor;
+			}
+		}
+
+		if (ClosestWall && LastWallJumpedFrom != ClosestWall)
+		{
+			LastWallJumpedFrom = ClosestWall;
+			UE_LOG(LogTemp, Log, TEXT("Launch off the wall!"));
+
+			FVector LaunchVelocity = (GetActorForwardVector() * WallJumpHorizontalMultiplier) + FVector(0, 0, WallJumpLaunch);
+			LaunchCharacter(LaunchVelocity, true, true);
+		}
+	}
+	else {
+		LastWallJumpedFrom = nullptr;
+	}
 }
 
 void AFirstPersonController::StopJump()

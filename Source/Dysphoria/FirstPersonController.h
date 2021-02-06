@@ -53,7 +53,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gameplay")
 	FVector MuzzleOffset;
 
-
 	UFUNCTION(BlueprintImplementableEvent, Category = "Weapon")
 	void FireFPSWeapon();
 
@@ -72,6 +71,17 @@ private:
 	float ControllerYawSensitivity = 1.f;
 	float ControllerPitchSensitivity = 1.f;
 	
+	UPROPERTY(EditDefaultsOnly, Category = "Movement")
+	float WallJumpLaunch = 800.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Movement")
+	float WallJumpHorizontalMultiplier = 800.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Movement")
+	float WallJumpCapsuleRadius = 60.f;
+
+	AActor* LastWallJumpedFrom;
+
 	// Default types of Gun/Sword
 	UGun* GunWeapon;
 	USword* SwordWeapon;
@@ -82,6 +92,9 @@ private:
 	// FPS camera.
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* FPSCameraComponent;
+
+	// For wall jump logic
+	UCapsuleComponent* WallJumpCapsuleComponent;
 
 	// First-person mesh (arms), visible only to the owning player.
 	UPROPERTY(VisibleDefaultsOnly, Category = "Mesh")
