@@ -8,7 +8,7 @@
 
 class USkeletalMeshComponent;
 class UDamageType;
-class UParticleSystemComponent;
+class UParticleSystem;
 
 UCLASS()
 class DYSPHORIA_API AFPSWeapon : public AActor
@@ -20,25 +20,25 @@ public:
 	AFPSWeapon();
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Visuals")
 	USkeletalMeshComponent* MeshComp;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Damage")
 	TSubclassOf<UDamageType> DamageType;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Visuals")
-	UParticleSystemComponent* MuzzleFlash;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Particles")
+	UParticleSystem* MuzzleFlash;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Visuals")
-	UParticleSystemComponent* BulletTrail;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Particles")
+	UParticleSystem* ImpactEffect;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Particles")
+	UParticleSystem* BulletTrail;
 
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Visuals")
+	FName MuzzleSocketName;
+
+public:
 	UFUNCTION(BlueprintCallable, Category = "Fire")
 	void Fire();
 };

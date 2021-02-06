@@ -23,12 +23,8 @@ public:
 	FVector GetLocation();
 	EEnemyType GetEnemyType();
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const & DamageEvent, AController * EventInstigator, AActor * DamageCauser);
+	
+	UFUNCTION(BlueprintCallable, Category="Death")
+	virtual void Die();
 };

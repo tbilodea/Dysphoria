@@ -23,17 +23,29 @@ EEnemyType ABaseAIEntity::GetEnemyType()
 	return EEnemyType::BODY_PARASITE;
 }
 
-// Called when the game starts or when spawned
-void ABaseAIEntity::BeginPlay()
+float ABaseAIEntity::TakeDamage(float DamageAmount, FDamageEvent const & DamageEvent, AController * EventInstigator, AActor * DamageCauser)
 {
-	Super::BeginPlay();
-	
+	int32 MyWellness = GetWellness();
+	if (MyWellness != 0) {
+		int32 AfterDamage = MyWellness - DamageAmount;
+
+		UE_LOG(LogTemp, Warning, TEXT("AI took damage!"));
+
+		if (AfterDamage <= 0) {
+			SetWellness(0);
+			DamageAmount = MyWellness;
+
+			Die();
+		}
+		else {
+			SetWellness(AfterDamage);
+		}
+	}
+
+	return APawn::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }
 
-// Called every frame
-void ABaseAIEntity::Tick(float DeltaTime)
+void ABaseAIEntity::Die()
 {
-	Super::Tick(DeltaTime);
-
+	UE_LOG(LogTemp, Warning, TEXT("BaseAIEntity::Die called for %s"), *(this->GetFName().ToString()));
 }
-
