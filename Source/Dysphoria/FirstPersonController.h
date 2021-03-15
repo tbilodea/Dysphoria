@@ -70,7 +70,9 @@ private:
 	float BaseSpeed = 0.f;
 	float ControllerYawSensitivity = 1.f;
 	float ControllerPitchSensitivity = 1.f;
-	
+	bool InWallRun = false;
+	int32 WallRideLastDirection = 0.f;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Movement")
 	float WallJumpLaunch = 800.f;
 
@@ -79,6 +81,12 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Movement")
 	float WallJumpCapsuleRadius = 60.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Movement")
+	float PlayerToWallDistance = 50.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Movement")
+	float WallRunSpeed = 300.f;
 
 	AActor* LastWallJumpedFrom;
 
@@ -124,4 +132,14 @@ private:
 	UFUNCTION()
 	void Reload();
 
+	UFUNCTION()
+	void DoWallRun();
+
+	UFUNCTION()
+	void AttachToWall(int Direction, float WallSpeed, FHitResult HitResult);
+
+	AActor* GetClosestJumpWall();
+
+	UFUNCTION()
+	void WallRunEnable();
 };
